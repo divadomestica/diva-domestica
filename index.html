@@ -22,8 +22,21 @@
 
   .masthead { background: var(--ink); color: var(--cream); text-align: center; padding: 0.35rem 2rem; font-family: var(--body); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; }
 
-  .header { background: var(--cream-dark); border-bottom: 2px solid var(--ink); padding: 2.5rem 2rem 1.5rem; text-align: center; position: relative; overflow: hidden; }
-  .header::before, .header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(180deg, var(--ink) 0px, var(--ink) 6px, transparent 6px, transparent 12px); }
+  .header { background: var(--cream-dark); border-bottom: 2px solid var(--ink); padding: 2.5rem 2rem 1.5rem; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
+  .header.has-photo { background-size: cover; background-position: center; background-repeat: no-repeat; padding: 4rem 2rem 2.5rem; }
+  .header.has-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(46,36,40,0.45) 0%, rgba(46,36,40,0.6) 100%); z-index: 0; }
+  .header.has-photo .header-ornament,
+  .header.has-photo h1,
+  .header.has-photo .header-sub,
+  .header.has-photo .header-rule { position: relative; z-index: 1; }
+  .header.has-photo h1 { color: var(--cream); }
+  .header.has-photo h1 em { color: var(--gold); }
+  .header.has-photo .header-sub { color: rgba(250,248,247,0.85); }
+  .header.has-photo .header-rule::before,
+  .header.has-photo .header-rule::after { background: var(--cream); opacity: 0.5; }
+  .header.has-photo .header-ornament { color: var(--gold); }
+  .header::before, .header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(180deg, var(--ink) 0px, var(--ink) 6px, transparent 6px, transparent 12px); z-index: 1; }
+  .header.has-photo::before, .header.has-photo::after { background: repeating-linear-gradient(180deg, rgba(250,248,247,0.4) 0px, rgba(250,248,247,0.4) 6px, transparent 6px, transparent 12px); }
   .header::before { left: 1.5rem; } .header::after { right: 1.5rem; }
   .header-ornament { font-size: 1.1rem; color: var(--gold); letter-spacing: 0.4em; margin-bottom: 0.5rem; display: block; }
   .header h1 { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 900; line-height: 1; color: var(--ink); margin-bottom: 0.3rem; }
@@ -127,8 +140,14 @@
   .sobre-section { background: var(--cream-dark); border-top: 1px solid var(--divider); border-bottom: 1px solid var(--divider); padding: 3rem 0; margin-bottom: 3rem; }
   .sobre-inner { display: grid; grid-template-columns: 200px 1fr; gap: 2.5rem; align-items: start; }
   @media (max-width: 600px) { .sobre-inner { grid-template-columns: 1fr; } }
-  .sobre-foto { width: 100%; aspect-ratio: 1; object-fit: cover; border: 2px solid var(--wine); }
-  .sobre-foto-placeholder { width: 200px; height: 200px; background: var(--wine-pale); border: 2px solid var(--wine); display: flex; align-items: center; justify-content: center; color: var(--wine-light); font-size: 3rem; }
+  .sobre-foto { width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border-width: var(--sobre-borde-grosor, 0px); border-style: solid; border-color: var(--sobre-borde-color, transparent); box-sizing: border-box; }
+
+  /* Borde grosor selector */
+  .borde-opciones { display: flex; gap: 0.6rem; margin-top: 0.4rem; flex-wrap: wrap; }
+  .borde-btn { background: none; border: 1px solid var(--divider); color: var(--ink-light); font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.35rem 0.85rem; cursor: pointer; transition: all 0.15s; }
+  .borde-btn:hover { border-color: var(--wine); color: var(--wine); }
+  .borde-btn.sel { background: var(--wine); color: var(--cream); border-color: var(--wine); }
+  .sobre-foto-placeholder { width: 200px; height: 200px; background: var(--wine-pale); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--wine-light); font-size: 3rem; flex-shrink: 0; }
   .sobre-bio { font-family: var(--body); font-size: 1.05rem; line-height: 1.85; color: var(--ink); }
 
   /* RECETAS */
@@ -475,6 +494,10 @@
         <div class="admin-box">
           <div class="admin-title">✦ Textos globales del sitio</div>
 
+          <label class="a-label">Foto de fondo del banner (URL) — déjalo vacío para sin foto</label>
+          <input type="text" id="cfg-banner-foto" class="a-input" placeholder="https://... (URL de tu foto)">
+          <div style="font-family:var(--body);font-size:0.78rem;color:var(--ink-light);margin-top:0.3rem;margin-bottom:0.75rem;font-style:italic;">Sube tu foto a <a href="https://imgbb.com" target="_blank" style="color:var(--wine);">imgbb.com</a> o similar y pega aquí el enlace directo.</div>
+
           <label class="a-label">Nombre de la columna</label>
           <input type="text" id="cfg-nombre" class="a-input" placeholder="La Diva Doméstica">
 
@@ -551,7 +574,32 @@
           <div class="admin-title">✦ Página «Sobre la Diva»</div>
           <label class="a-label">URL de tu foto</label>
           <input type="text" id="sobre-foto" class="a-input" placeholder="https://...">
-          <label class="a-label">Tu bio</label>
+
+          <label class="a-label" style="margin-top:1rem;">Borde de la foto</label>
+          <div class="color-row" style="margin-top:0.4rem;">
+            <label style="min-width:0;">Color:</label>
+            <input type="color" id="sobre-borde-color-picker" value="#8A6674"
+                   oninput="document.getElementById('sobre-borde-color-hex').value=this.value; previewBordeDiva();">
+            <input type="text"  id="sobre-borde-color-hex"    value="#8A6674" maxlength="7" placeholder="#8A6674"
+                   oninput="syncBordeColor(this.value)">
+          </div>
+          <div style="margin-top:0.5rem;">
+            <label class="a-label" style="margin-top:0;">Grosor:</label>
+            <div class="borde-opciones" id="borde-grosor-btns">
+              <button class="borde-btn" data-grosor="2px"  onclick="selGrosor(this)">Fino</button>
+              <button class="borde-btn" data-grosor="5px"  onclick="selGrosor(this)">Mediano</button>
+              <button class="borde-btn" data-grosor="10px" onclick="selGrosor(this)">Grueso</button>
+              <button class="borde-btn sel" data-grosor="0px" onclick="selGrosor(this)">Sin borde</button>
+            </div>
+          </div>
+
+          <!-- Preview miniatura -->
+          <div style="margin:1rem 0 0.25rem;display:flex;align-items:center;gap:1rem;">
+            <div id="sobre-borde-preview" style="width:60px;height:60px;border-radius:50%;background:var(--wine-pale);display:flex;align-items:center;justify-content:center;color:var(--wine-light);font-size:1.4rem;flex-shrink:0;border-width:0px;border-style:solid;border-color:#8A6674;box-sizing:border-box;">✦</div>
+            <span style="font-family:var(--fell);font-style:italic;font-size:0.82rem;color:var(--ink-light);">Vista previa del borde</span>
+          </div>
+
+          <label class="a-label" style="margin-top:1rem;">Tu bio</label>
           <textarea id="sobre-bio-input" class="a-input" rows="8" placeholder="Escribe aquí tu presentación con toda la elegancia que mereces..."></textarea>
           <button class="a-btn" onclick="guardarSobre()">Guardar «Sobre la Diva» ✦</button>
           <div class="a-msg" id="msg-sobre"></div>
@@ -605,6 +653,16 @@
     if (CONFIG.consejo_semana)  document.getElementById('consejo-semana').textContent = CONFIG.consejo_semana;
     if (CONFIG.proxima_edicion) document.getElementById('proxima-edicion').textContent = CONFIG.proxima_edicion;
 
+    // banner foto
+    const header = document.querySelector('.header');
+    if (CONFIG.banner_foto && CONFIG.banner_foto.trim()) {
+      header.style.backgroundImage = `url('${CONFIG.banner_foto.trim()}')`;
+      header.classList.add('has-photo');
+    } else {
+      header.style.backgroundImage = '';
+      header.classList.remove('has-photo');
+    }
+
     // colores
     const colorMap = {
       color_wine: '--wine', color_gold: '--gold', color_ink: '--ink', color_cream: '--cream'
@@ -635,10 +693,16 @@
       document.getElementById('sobre-bio').textContent = bio;
       if (foto) {
         document.getElementById('sobre-inner').innerHTML = `
-          <img src="${foto}" class="sobre-foto" alt="La Diva" onerror="this.style.display='none'">
+          <img src="${foto}" class="sobre-foto" id="sobre-foto-img" alt="La Diva" onerror="this.style.display='none'">
           <p class="sobre-bio" id="sobre-bio">${bio}</p>`;
       }
     }
+
+    // borde foto diva
+    const bColor  = CONFIG.sobre_borde_color  || '';
+    const bGrosor = CONFIG.sobre_borde_grosor || '0px';
+    document.documentElement.style.setProperty('--sobre-borde-color',  bColor  || 'transparent');
+    document.documentElement.style.setProperty('--sobre-borde-grosor', bGrosor);
   }
 
   async function setConfig(clave, valor) {
@@ -1156,6 +1220,7 @@
   // ── Admin: Textos ──
   function cargarFormTextos() {
     const campos = {
+      'cfg-banner-foto': CONFIG.banner_foto      || '',
       'cfg-nombre':    CONFIG.nombre_columna   || '',
       'cfg-subtitulo': CONFIG.subtitulo        || '',
       'cfg-pie':       CONFIG.pie_pagina       || '',
@@ -1171,6 +1236,7 @@
   async function guardarTextos() {
     try {
       const map = {
+        'cfg-banner-foto': 'banner_foto',
         'cfg-nombre':    'nombre_columna',
         'cfg-subtitulo': 'subtitulo',
         'cfg-pie':       'pie_pagina',
@@ -1270,12 +1336,54 @@
   function cargarFormSobre() {
     document.getElementById('sobre-foto').value = CONFIG.sobre_diva_foto || '';
     document.getElementById('sobre-bio-input').value = CONFIG.sobre_diva_bio || '';
+
+    // borde
+    const color  = CONFIG.sobre_borde_color  || '#8A6674';
+    const grosor = CONFIG.sobre_borde_grosor || '0px';
+    document.getElementById('sobre-borde-color-picker').value = color;
+    document.getElementById('sobre-borde-color-hex').value    = color;
+    // marcar botón activo
+    document.querySelectorAll('#borde-grosor-btns .borde-btn').forEach(btn => {
+      btn.classList.toggle('sel', btn.dataset.grosor === grosor);
+    });
+    actualizarPreviewBorde(grosor, color);
+  }
+
+  function syncBordeColor(hex) {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+      document.getElementById('sobre-borde-color-picker').value = hex;
+    }
+    previewBordeDiva();
+  }
+
+  function selGrosor(btn) {
+    document.querySelectorAll('#borde-grosor-btns .borde-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    previewBordeDiva();
+  }
+
+  function previewBordeDiva() {
+    const color  = document.getElementById('sobre-borde-color-hex').value || '#8A6674';
+    const grosor = (document.querySelector('#borde-grosor-btns .borde-btn.sel') || {}).dataset?.grosor || '0px';
+    actualizarPreviewBorde(grosor, color);
+  }
+
+  function actualizarPreviewBorde(grosor, color) {
+    const preview = document.getElementById('sobre-borde-preview');
+    if (preview) {
+      preview.style.borderWidth = grosor;
+      preview.style.borderColor = color;
+    }
   }
 
   async function guardarSobre() {
+    const grosor = (document.querySelector('#borde-grosor-btns .borde-btn.sel') || {}).dataset?.grosor || '0px';
+    const color  = document.getElementById('sobre-borde-color-hex').value.trim() || '#8A6674';
     try {
-      await setConfig('sobre_diva_foto', document.getElementById('sobre-foto').value.trim());
-      await setConfig('sobre_diva_bio',  document.getElementById('sobre-bio-input').value.trim());
+      await setConfig('sobre_diva_foto',  document.getElementById('sobre-foto').value.trim());
+      await setConfig('sobre_diva_bio',   document.getElementById('sobre-bio-input').value.trim());
+      await setConfig('sobre_borde_color',  color);
+      await setConfig('sobre_borde_grosor', grosor);
       await cargarConfig();
       setMsg('msg-sobre', '✦ Perfil guardado y publicado.');
     } catch(e) { setMsg('msg-sobre', 'Error al guardar.'); }
