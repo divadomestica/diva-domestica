@@ -187,13 +187,6 @@
   .receta-paso { font-family: var(--body); font-size: 0.95rem; line-height: 1.75; color: var(--ink); margin-bottom: 0.6rem; display: flex; gap: 0.75rem; }
   .receta-paso-num { font-family: var(--serif); font-weight: 700; color: var(--wine); font-size: 1.1rem; flex-shrink: 0; min-width: 1.5rem; }
 
-  /* Toque de la Diva */
-  .receta-toque { background: var(--wine-pale); border-left: 3px solid var(--wine); padding: 1rem 1.25rem; }
-  .receta-toque h4 { color: var(--wine) !important; border-color: transparent !important; padding-bottom: 0.3rem; margin-bottom: 0.6rem; }
-  .receta-toque-texto { font-family: var(--body); font-size: 0.97rem; color: var(--ink); line-height: 1.8; font-style: italic; }
-  .receta-toque-texto p { margin-bottom: 0.65rem; }
-  .receta-toque-texto p:last-child { margin-bottom: 0; }
-
   /* RECOMENDACIONES */
   .reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
   .reco-card { border-left: 3px solid var(--gold); padding: 0.75rem 1rem; background: var(--gold-pale); }
@@ -577,8 +570,6 @@
           <textarea id="rec-ingredientes" class="a-input" rows="4" placeholder="Un ingrediente por línea"></textarea>
           <label class="a-label">Pasos</label>
           <textarea id="rec-pasos" class="a-input" rows="5" placeholder="Un paso por línea"></textarea>
-          <label class="a-label">El toque de la Diva (opcional)</label>
-          <textarea id="rec-toque" class="a-input" rows="3" placeholder="El secreto, el consejo especial, la observación elegante… en párrafo libre."></textarea>
           <label class="a-label">URL foto (opcional)</label>
           <input type="text" id="rec-foto" class="a-input" placeholder="https://...">
           <button class="a-btn" onclick="publicarReceta()">Publicar receta ✦</button>
@@ -737,7 +728,8 @@
     const bio  = CONFIG.sobre_diva_bio  || '';
     const foto = CONFIG.sobre_diva_foto || '';
     if (bio || foto) {
-      document.getElementById('sobre').style.display = '';
+      const sobreEl = document.getElementById('sobre');
+      if (sobreEl) { sobreEl.style.display = ''; sobreEl.dataset.tieneContenido = '1'; }
       document.getElementById('nav-sobre').style.display = '';
       document.getElementById('sobre-bio').textContent = bio;
       if (foto) {
@@ -989,7 +981,7 @@
       const d = await r.json();
       if (!Array.isArray(d) || !d.length) return;
       _recetasData = d;
-      document.getElementById('recetas').style.display = '';
+      // Solo mostrar el enlace del nav — la sección se abre al hacer clic
       document.getElementById('nav-recetas').style.display = '';
       document.getElementById('recetas-grid').innerHTML = d.map(rec => `
         <div class="receta-card" onclick="abrirReceta(${rec.id})">
@@ -1026,11 +1018,6 @@
         <div class="receta-seccion">
           <h4>✦ Preparación</h4>
           ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
-        </div>` : ''}
-      ${rec.toque_diva ? `
-        <div class="receta-seccion receta-toque">
-          <h4>✦ El toque de la Diva</h4>
-          <div class="receta-toque-texto">${rec.toque_diva.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')}</div>
         </div>` : ''}`;
     document.getElementById('receta-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -1048,7 +1035,7 @@
       const r = await fetch(`${SB}/rest/v1/recomendaciones?activa=eq.true&order=created_at.desc`, { headers: GH });
       const d = await r.json();
       if (!Array.isArray(d) || !d.length) return;
-      document.getElementById('recomendaciones').style.display = '';
+      // Solo mostrar el enlace del nav — la sección se abre al hacer clic
       document.getElementById('nav-recos').style.display = '';
       document.getElementById('recos-grid').innerHTML = d.map(rec => `
         <div class="reco-card">
@@ -1070,16 +1057,67 @@
     });
   });
 
-  // ── NAV ──
+  // ── NAV — SISTEMA DE VISTAS ──
+  // Secciones que forman la "vista normal" (página principal)
+  const SECCIONES_NORMALES = ['columna', 'foro', 'escribir', 'archivo', 'sobre'];
+  // Secciones que son "vistas exclusivas" (ocultan todo lo demás)
+  const VISTAS_EXCLUSIVAS  = { recetas: 'recetas', recomendaciones: 'recomendaciones' };
+
+  function activarVistaExclusiva(seccionId) {
+    // Ocultar todas las secciones normales
+    SECCIONES_NORMALES.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // Ocultar otras vistas exclusivas
+    Object.keys(VISTAS_EXCLUSIVAS).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = id === seccionId ? '' : 'none';
+    });
+    // Scroll al inicio suave
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function activarVistaNormal(anchorId) {
+    // Mostrar todas las secciones normales
+    SECCIONES_NORMALES.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      // "sobre" solo se muestra si tiene contenido (controlado por aplicarConfig)
+      if (id === 'sobre' && !el.dataset.tieneContenido) return;
+      el.style.display = '';
+    });
+    // Ocultar vistas exclusivas
+    Object.keys(VISTAS_EXCLUSIVAS).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // Scroll a la sección pedida
+    if (anchorId) {
+      setTimeout(() => {
+        const t = document.getElementById(anchorId);
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
+  }
+
   document.querySelectorAll('nav a').forEach(a => {
     a.addEventListener('click', function(e) {
       e.preventDefault();
       document.querySelectorAll('nav a').forEach(x => x.classList.remove('active'));
       this.classList.add('active');
-      const t = document.querySelector(this.getAttribute('href'));
-      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const href      = this.getAttribute('href');
+      const seccionId = href ? href.replace('#', '') : '';
+
+      if (VISTAS_EXCLUSIVAS[seccionId] !== undefined) {
+        activarVistaExclusiva(seccionId);
+      } else {
+        activarVistaNormal(seccionId);
+      }
     });
   });
+
 
   // ══════════════════════════════════════════════
   //  ADMIN
@@ -1379,16 +1417,15 @@
     const descripcion  = document.getElementById('rec-desc').value.trim();
     const ingredientes = document.getElementById('rec-ingredientes').value.trim();
     const pasos        = document.getElementById('rec-pasos').value.trim();
-    const toque_diva   = document.getElementById('rec-toque').value.trim() || null;
     const foto_url     = document.getElementById('rec-foto').value.trim() || null;
     if (!titulo) { setMsg('msg-receta', 'El título es obligatorio.'); return; }
     try {
       const r = await fetch(`${SB}/rest/v1/recetas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, descripcion, ingredientes, pasos, toque_diva, foto_url, activa: true })
+        body: JSON.stringify({ titulo, descripcion, ingredientes, pasos, foto_url, activa: true })
       });
       if (!r.ok) throw new Error(await r.text());
-      ['rec-titulo','rec-desc','rec-ingredientes','rec-pasos','rec-toque','rec-foto'].forEach(id => document.getElementById(id).value = '');
+      ['rec-titulo','rec-desc','rec-ingredientes','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-receta', '✦ Receta publicada.');
       await Promise.all([cargarListaRecetas(), cargarRecetas()]);
     } catch(e) { setMsg('msg-receta', 'Error al publicar receta.'); }
