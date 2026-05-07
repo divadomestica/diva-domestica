@@ -187,6 +187,13 @@
   .receta-paso { font-family: var(--body); font-size: 0.95rem; line-height: 1.75; color: var(--ink); margin-bottom: 0.6rem; display: flex; gap: 0.75rem; }
   .receta-paso-num { font-family: var(--serif); font-weight: 700; color: var(--wine); font-size: 1.1rem; flex-shrink: 0; min-width: 1.5rem; }
 
+  /* Toque de la Diva */
+  .receta-toque { background: var(--wine-pale); border-left: 3px solid var(--wine); padding: 1rem 1.25rem; }
+  .receta-toque h4 { color: var(--wine) !important; border-color: transparent !important; padding-bottom: 0.3rem; margin-bottom: 0.6rem; }
+  .receta-toque-texto { font-family: var(--body); font-size: 0.97rem; color: var(--ink); line-height: 1.8; font-style: italic; }
+  .receta-toque-texto p { margin-bottom: 0.65rem; }
+  .receta-toque-texto p:last-child { margin-bottom: 0; }
+
   /* RECOMENDACIONES */
   .reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
   .reco-card { border-left: 3px solid var(--gold); padding: 0.75rem 1rem; background: var(--gold-pale); }
@@ -570,6 +577,8 @@
           <textarea id="rec-ingredientes" class="a-input" rows="4" placeholder="Un ingrediente por línea"></textarea>
           <label class="a-label">Pasos</label>
           <textarea id="rec-pasos" class="a-input" rows="5" placeholder="Un paso por línea"></textarea>
+          <label class="a-label">El toque de la Diva (opcional)</label>
+          <textarea id="rec-toque" class="a-input" rows="3" placeholder="El secreto, el consejo especial, la observación elegante… en párrafo libre."></textarea>
           <label class="a-label">URL foto (opcional)</label>
           <input type="text" id="rec-foto" class="a-input" placeholder="https://...">
           <button class="a-btn" onclick="publicarReceta()">Publicar receta ✦</button>
@@ -1017,6 +1026,11 @@
         <div class="receta-seccion">
           <h4>✦ Preparación</h4>
           ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
+        </div>` : ''}
+      ${rec.toque_diva ? `
+        <div class="receta-seccion receta-toque">
+          <h4>✦ El toque de la Diva</h4>
+          <div class="receta-toque-texto">${rec.toque_diva.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')}</div>
         </div>` : ''}`;
     document.getElementById('receta-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -1365,15 +1379,16 @@
     const descripcion  = document.getElementById('rec-desc').value.trim();
     const ingredientes = document.getElementById('rec-ingredientes').value.trim();
     const pasos        = document.getElementById('rec-pasos').value.trim();
+    const toque_diva   = document.getElementById('rec-toque').value.trim() || null;
     const foto_url     = document.getElementById('rec-foto').value.trim() || null;
     if (!titulo) { setMsg('msg-receta', 'El título es obligatorio.'); return; }
     try {
       const r = await fetch(`${SB}/rest/v1/recetas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, descripcion, ingredientes, pasos, foto_url, activa: true })
+        body: JSON.stringify({ titulo, descripcion, ingredientes, pasos, toque_diva, foto_url, activa: true })
       });
       if (!r.ok) throw new Error(await r.text());
-      ['rec-titulo','rec-desc','rec-ingredientes','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
+      ['rec-titulo','rec-desc','rec-ingredientes','rec-pasos','rec-toque','rec-foto'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-receta', '✦ Receta publicada.');
       await Promise.all([cargarListaRecetas(), cargarRecetas()]);
     } catch(e) { setMsg('msg-receta', 'Error al publicar receta.'); }
