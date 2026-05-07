@@ -23,14 +23,20 @@
   .masthead { background: var(--ink); color: var(--cream); text-align: center; padding: 0.35rem 2rem; font-family: var(--body); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; }
 
   .header { background: var(--cream-dark); border-bottom: 2px solid var(--ink); padding: 2.5rem 2rem 1.5rem; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
-  .header.has-photo { background-size: cover; background-position: center; background-repeat: no-repeat; padding: 0; min-height: 320px; }
-  .header.has-photo::after { display: none; }
+  .header.has-photo { background-size: cover; background-position: center; background-repeat: no-repeat; padding: 4rem 2rem 2.5rem; }
+  .header.has-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(46,36,40,0.45) 0%, rgba(46,36,40,0.6) 100%); z-index: 0; }
   .header.has-photo .header-ornament,
   .header.has-photo h1,
   .header.has-photo .header-sub,
-  .header.has-photo .header-rule { display: none; }
+  .header.has-photo .header-rule { position: relative; z-index: 1; }
+  .header.has-photo h1 { color: var(--cream); }
+  .header.has-photo h1 em { color: var(--gold); }
+  .header.has-photo .header-sub { color: rgba(250,248,247,0.85); }
+  .header.has-photo .header-rule::before,
+  .header.has-photo .header-rule::after { background: var(--cream); opacity: 0.5; }
+  .header.has-photo .header-ornament { color: var(--gold); }
   .header::before, .header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(180deg, var(--ink) 0px, var(--ink) 6px, transparent 6px, transparent 12px); z-index: 1; }
-  .header.has-photo::before, .header.has-photo::after { display: none; }
+  .header.has-photo::before, .header.has-photo::after { background: repeating-linear-gradient(180deg, rgba(250,248,247,0.4) 0px, rgba(250,248,247,0.4) 6px, transparent 6px, transparent 12px); }
   .header::before { left: 1.5rem; } .header::after { right: 1.5rem; }
   .header-ornament { font-size: 1.1rem; color: var(--gold); letter-spacing: 0.4em; margin-bottom: 0.5rem; display: block; }
   .header h1 { font-family: var(--serif); font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 900; line-height: 1; color: var(--ink); margin-bottom: 0.3rem; }
@@ -243,81 +249,7 @@
   .respuesta-form { background: var(--cream-dark); border: 1px solid var(--divider); padding: 0.75rem; margin-top: 0.5rem; }
   .respuesta-form textarea { width: 100%; border: 1px solid var(--divider); background: var(--cream); font-family: var(--body); font-size: 0.88rem; color: var(--ink); padding: 0.5rem 0.7rem; resize: vertical; }
   .respuesta-form textarea:focus { outline: none; border-color: var(--wine); }
-
-  /* ── BUSCADOR ── */
-  #search-btn { background: none; border: none; border-left: 1px solid var(--divider); color: var(--ink); font-size: 1rem; padding: 0.75rem 1.1rem; cursor: pointer; transition: background 0.2s, color 0.2s; line-height: 1; }
-  #search-btn:hover { background: var(--wine); color: var(--cream); }
-  #search-overlay { display: none; position: fixed; inset: 0; background: rgba(46,36,40,0.96); z-index: 1100; overflow-y: auto; }
-  .search-wrap { max-width: 680px; margin: 0 auto; padding: 3rem 2rem 4rem; position: relative; }
-  .search-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; color: rgba(250,248,247,0.45); font-size: 1rem; line-height: 1; cursor: pointer; padding: 0.25rem; transition: color 0.15s; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; }
-  .search-close:hover { color: var(--cream); }
-  .search-bar { display: flex; align-items: stretch; gap: 0; margin: 2rem 0 1.5rem; border: 1px solid rgba(171,156,209,0.5); background: var(--cream); }
-  .search-bar input { flex: 1; border: none; background: transparent; font-family: var(--body); font-size: 1.05rem; padding: 0.75rem 1rem; color: var(--ink); outline: none; min-width: 0; }
-  .search-bar input::placeholder { color: var(--ink-light); font-style: italic; }
-  .search-bar button { background: var(--wine); border: none; color: var(--cream); font-family: var(--body); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0 1.25rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .search-bar button:hover { background: var(--ink); }
-  .search-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
-  .sf-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: var(--cream); font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.3rem 0.85rem; cursor: pointer; transition: all 0.15s; }
-  .sf-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .sf-btn.active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
-  .search-results-title { font-family: var(--fell); font-style: italic; font-size: 0.82rem; color: rgba(250,248,247,0.5); letter-spacing: 0.1em; margin-bottom: 1rem; }
-  .search-result { background: var(--cream); padding: 1.1rem 1.25rem; margin-bottom: 0.75rem; cursor: pointer; border-left: 3px solid transparent; transition: border-color 0.15s, transform 0.15s; }
-  .search-result:hover { border-left-color: var(--gold); transform: translateX(3px); }
-  .sr-type { font-family: var(--body); font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--wine); margin-bottom: 0.3rem; }
-  .sr-titulo { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 0.25rem; }
-  .sr-snippet { font-family: var(--body); font-size: 0.88rem; color: var(--ink-light); line-height: 1.5; }
-  .sr-snippet em { background: rgba(171,156,209,0.35); font-style: normal; padding: 0 2px; }
-  .search-empty { font-family: var(--fell); font-style: italic; color: rgba(250,248,247,0.45); text-align: center; padding: 2rem; font-size: 1rem; }
-  .search-group-label { font-family: var(--body); font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid rgba(171,156,209,0.3); padding-bottom: 0.4rem; margin: 1.5rem 0 0.75rem; }
-  .search-group-label:first-child { margin-top: 0; }
-
-  /* ── BOTÓN COMPARTIR (en cartas, recetas, etc.) ── */
-  .btn-share { background: none; border: 1px solid var(--divider); color: var(--ink-light); padding: 4px 6px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
-  .btn-share:hover { border-color: var(--wine); color: var(--wine); background: var(--wine-pale); }
-  .btn-share svg { display: block; pointer-events: none; }
-
-  /* ── SHARE MODAL ── */
-  #share-modal { display: none; position: fixed; inset: 0; background: rgba(46,36,40,0.92); z-index: 600; overflow-y: auto; padding: 2rem 1rem; }
-  .share-modal-inner { max-width: 500px; margin: 0 auto; background: var(--cream); padding: 2rem; position: relative; }
-  .share-close-btn { position: absolute; top: 0.85rem; right: 0.85rem; background: none; border: none; color: var(--ink-light); font-size: 0.9rem; cursor: pointer; line-height: 1; padding: 0.2rem; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; transition: color 0.15s; }
-  .share-close-btn:hover { color: var(--wine); }
-  .share-modal-title { font-family: var(--serif); font-size: 1.4rem; font-style: italic; color: var(--wine); margin-bottom: 0.25rem; }
-  .share-modal-sub { font-family: var(--fell); font-style: italic; font-size: 0.82rem; color: var(--ink-light); margin-bottom: 1.5rem; }
-  .share-preview-wrap { width: 100%; min-height: 80px; background: var(--cream-dark); border: 1px solid var(--divider); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; overflow: hidden; }
-  .share-preview-wrap img { width: 100%; height: auto; display: block; }
-  .generating { font-family: var(--fell); font-style: italic; font-size: 0.85rem; color: var(--ink-light); }
-  .share-btns { display: flex; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 1rem; }
-  .share-btn-wa, .share-btn-ig, .share-btn-dl, .share-btn-native {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
-    border: 1px solid var(--divider); background: none; color: var(--ink); padding: 0.6rem 1rem;
-    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
-  }
-  .share-btn-wa  { border-color: #25D366; color: #128C47; }
-  .share-btn-wa:hover  { background: #25D366; color: #fff; }
-  .share-btn-ig  { border-color: #C13584; color: #C13584; }
-  .share-btn-ig:hover  { background: #C13584; color: #fff; }
-  .share-btn-dl  { border-color: var(--wine); color: var(--wine); }
-  .share-btn-dl:hover  { background: var(--wine); color: var(--cream); }
-  .share-btn-native { border-color: var(--gold); color: var(--ink); }
-  .share-btn-native:hover { background: var(--gold); }
-  .share-note { font-family: var(--fell); font-style: italic; font-size: 0.78rem; color: var(--ink-light); }
-
-  /* ── TARJETA DE COMPARTIR (oculta) ── */
-  #share-card-tpl { position: fixed; left: -9999px; top: 0; pointer-events: none; }
-  .sc-wrap { width: 600px; background: var(--cream-dark); font-family: var(--body); padding: 0; }
-  .sc-header { background: var(--ink); color: var(--cream); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-  .sc-logo { font-family: var(--serif); font-size: 1.15rem; font-style: italic; color: var(--gold); }
-  .sc-ornament { color: var(--wine-light); letter-spacing: 0.3em; font-size: 0.8rem; }
-  .sc-body { padding: 1.5rem; }
-  .sc-tipo { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--wine); margin-bottom: 0.5rem; }
-  .sc-titulo { font-family: var(--serif); font-size: 1.4rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; line-height: 1.2; }
-  .sc-texto { font-size: 0.88rem; color: var(--ink-light); line-height: 1.6; margin-bottom: 0.75rem; }
-  .sc-autor { font-family: var(--fell); font-style: italic; font-size: 0.82rem; color: var(--wine); }
-  .sc-footer { background: var(--ink); color: var(--divider); padding: 0.65rem 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; letter-spacing: 0.08em; }
-  .sc-stars { color: var(--wine-light); letter-spacing: 0.3em; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -338,7 +270,6 @@
   <a href="#recetas" id="nav-recetas" style="display:none;">Recetas</a>
   <a href="#recomendaciones" id="nav-recos" style="display:none;">Recomendaciones</a>
   <a href="#sobre" id="nav-sobre" style="display:none;">Sobre la Diva</a>
-  <button id="search-btn" onclick="abrirBuscador()" title="Buscar">⌕</button>
 </nav>
 
 <main>
@@ -955,7 +886,6 @@
         <button class="carta-likes${isL ? ' liked' : ''}" data-count="${row.likes || 0}" data-id="${row.id}" onclick="toggleLike(this)">
           ${isL ? '♥' : '♡'} <span>${row.likes || 0}</span>
         </button>
-        <button class="btn-share" onclick='abrirShare("carta",${JSON.stringify({id:row.id,titulo:row.nombre+(row.ciudad?", "+row.ciudad:""),texto:row.texto||"",autor:row.nombre,tipo:"Carta de lectora"})})' title="Compartir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
       </div>
       <div class="carta-body" data-full="${texto.replace(/"/g,'&quot;')}" data-expanded="false">${textoVisible}</div>
       ${corto ? `<button onclick="toggleLeerMas(this)" style="background:none;border:none;color:var(--wine);font-family:var(--body);font-size:0.78rem;cursor:pointer;padding:0.4rem 0 0.2rem;letter-spacing:0.05em;">Leer más ✦</button>` : ''}
@@ -1090,7 +1020,6 @@
         </div>` : ''}`;
     document.getElementById('receta-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
-    _inyectarShareReceta(rec);
   }
 
   function cerrarRecetaModal(e) {
@@ -1113,7 +1042,6 @@
           <div class="reco-titulo">${rec.titulo}</div>
           <div class="reco-desc">${rec.descripcion || ''}</div>
           ${rec.url ? `<a href="${rec.url}" target="_blank" rel="noopener" class="reco-url">Ver →</a>` : ''}
-          ${_shareRecoBtn(rec)}
         </div>`).join('');
     } catch(e) {}
   }
@@ -1570,339 +1498,6 @@
   // cargar form sobre al abrir tab
   document.querySelector('[onclick="switchTab(\'tab-sobre\',this)"]').addEventListener('click', cargarFormSobre);
 
-
-  // ══════════════════════════════════════════════
-  //  BUSCADOR — MOTOR EXTENSIBLE
-  //  Para añadir una nueva sección en el futuro,
-  //  basta con añadir un objeto a SEARCH_SOURCES.
-  // ══════════════════════════════════════════════
-
-  /*  Cada fuente tiene:
-      key      → identificador único
-      label    → nombre visible en filtros
-      table    → tabla de Supabase
-      fields   → columnas donde buscar (se usan con ilike)
-      titulo   → función que extrae el título del resultado
-      snippet  → función que extrae el texto de preview
-      anchor   → id del elemento HTML al que navegar al hacer clic
-      onSelect → función opcional al hacer clic (si no hay anchor)
-  */
-  const SEARCH_SOURCES = [
-    {
-      key: 'columnas',
-      label: 'Columnas',
-      table: 'columnas',
-      fields: ['titulo', 'contenido', 'kicker', 'byline'],
-      titulo:  r => r.titulo || '(Sin título)',
-      snippet: r => r.contenido ? r.contenido.slice(0, 140) : '',
-      anchor:  'columna',
-      onSelect: r => verArchivoColumna(r.id)
-    },
-    {
-      key: 'cartas',
-      label: 'Cartas',
-      table: 'cartas',
-      fields: ['texto', 'nombre', 'ciudad'],
-      titulo:  r => r.nombre + (r.ciudad ? ', ' + r.ciudad : ''),
-      snippet: r => r.texto ? r.texto.slice(0, 140) : '',
-      anchor:  'foro',
-      onSelect: null
-    },
-    {
-      key: 'recetas',
-      label: 'Recetas',
-      table: 'recetas',
-      fields: ['titulo', 'descripcion', 'ingredientes', 'pasos'],
-      titulo:  r => r.titulo || '(Sin título)',
-      snippet: r => r.descripcion || '',
-      anchor:  'recetas',
-      onSelect: null
-    },
-    {
-      key: 'recomendaciones',
-      label: 'Recomendaciones',
-      table: 'recomendaciones',
-      fields: ['titulo', 'descripcion'],
-      titulo:  r => r.titulo || '(Sin título)',
-      snippet: r => r.descripcion || '',
-      anchor:  'recomendaciones',
-      onSelect: null
-    }
-  ];
-
-  // Genera los botones de filtro dinámicamente
-  function iniciarFiltrosBuscador() {
-    const bar = document.getElementById('search-filters');
-    SEARCH_SOURCES.forEach(src => {
-      const btn = document.createElement('button');
-      btn.className = 'sf-btn';
-      btn.dataset.source = src.key;
-      btn.textContent = src.label;
-      btn.onclick = () => filtrarResultados(src.key, btn);
-      bar.appendChild(btn);
-    });
-  }
-  iniciarFiltrosBuscador();
-
-  let _searchResults = []; // caché de resultados
-  let _activeFilter  = 'all';
-
-  function abrirBuscador() {
-    document.getElementById('search-overlay').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('search-input').focus(), 100);
-  }
-
-  function cerrarBuscador() {
-    document.getElementById('search-overlay').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  document.getElementById('search-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') ejecutarBusqueda();
-    if (e.key === 'Escape') cerrarBuscador();
-  });
-
-  function resaltarTermino(texto, termino) {
-    if (!termino) return texto;
-    const re = new RegExp('(' + termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-    return texto.replace(re, '<em>$1</em>');
-  }
-
-  async function ejecutarBusqueda() {
-    const q = document.getElementById('search-input').value.trim();
-    const resDiv = document.getElementById('search-results');
-    const titleDiv = document.getElementById('search-results-title');
-
-    if (q.length < 2) {
-      resDiv.innerHTML = '<div class="search-empty">Escribe al menos 2 caracteres para buscar.</div>';
-      titleDiv.textContent = '';
-      return;
-    }
-
-    resDiv.innerHTML = '<div class="search-empty">Buscando…</div>';
-    titleDiv.textContent = '';
-    _searchResults = [];
-
-    // Buscar en todas las fuentes en paralelo
-    const enc = encodeURIComponent(q);
-    await Promise.all(SEARCH_SOURCES.map(async src => {
-      try {
-        // construir filtro ilike para cada field con OR
-        const filterParts = src.fields.map(f => `${f}=ilike.*${enc}*`).join('&');
-        // Supabase no soporta OR en query string nativo sin RPC para múltiples campos,
-        // así que buscamos por el primer campo principal y filtramos client-side
-        const r = await fetch(
-          `${SB}/rest/v1/${src.table}?or=(${src.fields.map(f => `${f}.ilike.*${enc}*`).join(',')})&limit=20`,
-          { headers: GH }
-        );
-        const d = await r.json();
-        if (Array.isArray(d)) {
-          d.forEach(item => _searchResults.push({ ...item, _source: src.key, _src: src }));
-        }
-      } catch(e) { /* fuente no disponible, continuar */ }
-    }));
-
-    _activeFilter = 'all';
-    document.querySelectorAll('.sf-btn').forEach(b => b.classList.toggle('active', b.dataset.source === 'all'));
-    renderResultados(q);
-  }
-
-  function filtrarResultados(sourceKey, btn) {
-    _activeFilter = sourceKey;
-    document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const q = document.getElementById('search-input').value.trim();
-    renderResultados(q);
-  }
-
-  function renderResultados(q) {
-    const resDiv   = document.getElementById('search-results');
-    const titleDiv = document.getElementById('search-results-title');
-    const filtered = _activeFilter === 'all'
-      ? _searchResults
-      : _searchResults.filter(r => r._source === _activeFilter);
-
-    if (!filtered.length) {
-      resDiv.innerHTML = '<div class="search-empty">No se encontraron resultados para "' + q + '".</div>';
-      titleDiv.textContent = '';
-      return;
-    }
-
-    titleDiv.textContent = filtered.length + ' resultado' + (filtered.length !== 1 ? 's' : '') + ' para "' + q + '"';
-
-    // Agrupar por fuente
-    const grupos = {};
-    filtered.forEach(r => {
-      if (!grupos[r._source]) grupos[r._source] = [];
-      grupos[r._source].push(r);
-    });
-
-    let html = '';
-    Object.entries(grupos).forEach(([key, items]) => {
-      const src = SEARCH_SOURCES.find(s => s.key === key);
-      if (!src) return;
-      html += `<div class="search-group-label">${src.label}</div>`;
-      items.forEach(item => {
-        const tit  = src.titulo(item);
-        const snip = src.snippet(item);
-        const snipResaltado = resaltarTermino(snip.slice(0, 160) + (snip.length > 160 ? '…' : ''), q);
-        html += `<div class="search-result" onclick="seleccionarResultado('${key}', ${item.id})">
-          <div class="sr-type">${src.label}</div>
-          <div class="sr-titulo">${resaltarTermino(tit, q)}</div>
-          ${snip ? `<div class="sr-snippet">${snipResaltado}</div>` : ''}
-        </div>`;
-      });
-    });
-
-    resDiv.innerHTML = html;
-  }
-
-  function seleccionarResultado(sourceKey, id) {
-    const src  = SEARCH_SOURCES.find(s => s.key === sourceKey);
-    const item = _searchResults.find(r => r._source === sourceKey && r.id === id);
-    if (!src || !item) return;
-    cerrarBuscador();
-    if (src.onSelect) {
-      src.onSelect(item);
-    } else if (src.anchor) {
-      const el = document.getElementById(src.anchor);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-
-  // ══════════════════════════════════════════════
-  //  COMPARTIR
-  // ══════════════════════════════════════════════
-  let _shareData   = {};   // datos del item actual
-  let _shareImgBlob = null; // blob de la imagen generada
-  let _shareImgUrl  = null; // object URL temporal
-
-  function abrirShare(tipo, datos) {
-    _shareData    = { tipo, ...datos };
-    _shareImgBlob = null;
-    if (_shareImgUrl) { URL.revokeObjectURL(_shareImgUrl); _shareImgUrl = null; }
-
-    document.getElementById('share-modal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    document.getElementById('share-preview-wrap').innerHTML = '<span class="generating">Generando tarjeta…</span>';
-
-    // Mostrar botón nativo si Web Share API con files disponible
-    const nativo = document.getElementById('btn-native');
-    nativo.style.display = (navigator.canShare && navigator.canShare({ files: [new File([''], 'test.png', { type: 'image/png' })] })) ? '' : 'none';
-
-    generarTarjeta();
-  }
-
-  function cerrarShare() {
-    document.getElementById('share-modal').style.display = 'none';
-    document.body.style.overflow = '';
-    if (_shareImgUrl) { URL.revokeObjectURL(_shareImgUrl); _shareImgUrl = null; }
-  }
-
-  function poblarTarjeta() {
-    const d = _shareData;
-    const tipoLabel = {
-      carta: 'Carta de lectora', receta: 'Receta de la Diva',
-      recomendacion: 'Recomendación semanal', columna: 'La Columna'
-    }[d.tipo] || d.tipo;
-
-    document.getElementById('sc-tipo').textContent  = tipoLabel;
-    document.getElementById('sc-titulo').textContent = d.titulo || '';
-
-    // texto: máx 300 chars para que quepa bien
-    const txt = (d.texto || '').slice(0, 300) + ((d.texto||'').length > 300 ? '…' : '');
-    document.getElementById('sc-texto').textContent  = txt;
-    document.getElementById('sc-autor').textContent  = d.autor ? '— ' + d.autor : '';
-    document.getElementById('sc-url').textContent    = window.location.hostname || 'La Diva Doméstica';
-  }
-
-  async function generarTarjeta() {
-    poblarTarjeta();
-    // esperar un tick para que el DOM se pinte
-    await new Promise(r => setTimeout(r, 80));
-    try {
-      const el = document.getElementById('sc-wrap');
-      const canvas = await html2canvas(el, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
-        width: 600,
-        windowWidth: 700
-      });
-      canvas.toBlob(blob => {
-        _shareImgBlob = blob;
-        _shareImgUrl  = URL.createObjectURL(blob);
-        const img = document.createElement('img');
-        img.src = _shareImgUrl;
-        img.alt = 'Tarjeta para compartir';
-        img.style.borderRadius = '8px';
-        document.getElementById('share-preview-wrap').innerHTML = '';
-        document.getElementById('share-preview-wrap').appendChild(img);
-      }, 'image/png');
-    } catch(e) {
-      document.getElementById('share-preview-wrap').innerHTML =
-        '<span class="generating">No se pudo generar la imagen. Puedes compartir el enlace igual.</span>';
-    }
-  }
-
-  function shareWhatsApp() {
-    const url   = window.location.href;
-    const d     = _shareData;
-    const texto = (d.titulo ? '*' + d.titulo + '*\n' : '') +
-                  (d.texto  ? d.texto.slice(0, 200) + (d.texto.length > 200 ? '…' : '') + '\n\n' : '') +
-                  'Lee más en La Diva Doméstica: ' + url;
-    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
-  }
-
-  function shareInstagram() {
-    // Instagram no admite compartir desde web — descargamos la imagen
-    shareDescargar();
-    notif('✦ Imagen descargada. Súbela desde la app de Instagram.');
-    document.getElementById('share-note-ig').style.color = 'var(--wine)';
-  }
-
-  function shareDescargar() {
-    if (!_shareImgBlob) { notif('La imagen aún se está generando, espera un momento.'); return; }
-    const a    = document.createElement('a');
-    a.href     = URL.createObjectURL(_shareImgBlob);
-    a.download = 'diva-domestica-' + (_shareData.tipo || 'compartir') + '.png';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  async function shareNativo() {
-    if (!_shareImgBlob) { notif('La imagen aún se está generando, espera un momento.'); return; }
-    const url  = window.location.href;
-    const d    = _shareData;
-    const file = new File([_shareImgBlob], 'diva-domestica.png', { type: 'image/png' });
-    try {
-      await navigator.share({
-        title: d.titulo || 'La Diva Doméstica',
-        text:  (d.titulo || '') + '\n' + url,
-        files: [file]
-      });
-    } catch(e) {
-      if (e.name !== 'AbortError') notif('No se pudo compartir. Intenta descargar la imagen.');
-    }
-  }
-
-  // Añadir botón compartir en recetas (dentro del modal de receta)
-  // Se llama desde abrirReceta — inyectamos el botón en la sección de acciones
-  function _inyectarShareReceta(rec) {
-    const wrap = document.getElementById('receta-share-btn-wrap');
-    if (!wrap) return;
-    wrap.innerHTML = `<button class="btn-share" style="margin-top:1rem;" onclick='abrirShare("receta",${JSON.stringify({titulo:rec.titulo,texto:rec.descripcion||"",autor:"La Diva Doméstica",tipo:"receta"})})'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Compartir receta</button>`;
-  }
-
-  // Añadir botón compartir en recomendaciones
-  function _shareRecoBtn(rec) {
-    return `<button class="btn-share" style="margin-top:0.5rem;" onclick='abrirShare("recomendacion",${JSON.stringify({titulo:rec.titulo,texto:rec.descripcion||"",autor:"La Diva Doméstica",tipo:"recomendacion"})})'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Compartir</button>`;
-  }
-
-
   // ── INIT ──
   cargarConfig().then(() => {
     cargarColumna();
@@ -1912,88 +1507,5 @@
     cargarRecomendaciones();
   });
 </script>
-
-<!-- ══════════════════════════════════════════════
-     BUSCADOR
-══════════════════════════════════════════════ -->
-<div id="search-overlay">
-  <div class="search-wrap">
-    <button class="search-close" onclick="cerrarBuscador()" title="Cerrar">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="1" y1="1" x2="13" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="13" y1="1" x2="1" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
-    <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Buscar columnas, cartas, recetas…" autocomplete="off">
-      <button onclick="ejecutarBusqueda()">Buscar</button>
-    </div>
-    <div class="search-filters" id="search-filters">
-      <button class="sf-btn active" data-source="all" onclick="filtrarResultados('all',this)">Todo</button>
-      <!-- los filtros se generan automáticamente según las fuentes registradas -->
-    </div>
-    <div class="search-results-title" id="search-results-title"></div>
-    <div id="search-results"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     MODAL DE COMPARTIR
-══════════════════════════════════════════════ -->
-<div id="share-modal">
-  <div class="share-modal-inner">
-    <button class="share-close-btn" onclick="cerrarShare()" title="Cerrar">
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
-    <div class="share-modal-title">Compartir ✦</div>
-    <div class="share-modal-sub">Se generará una tarjeta con la estética de la columna lista para compartir.</div>
-    <div class="share-preview-wrap" id="share-preview-wrap">
-      <span class="generating">Generando tarjeta…</span>
-    </div>
-    <div class="share-btns">
-      <button class="share-btn-wa" id="btn-wa" onclick="shareWhatsApp()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </button>
-      <button class="share-btn-ig" id="btn-ig" onclick="shareInstagram()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-        Instagram
-      </button>
-      <button class="share-btn-dl" id="btn-dl" onclick="shareDescargar()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargar
-      </button>
-      <button class="share-btn-native" id="btn-native" onclick="shareNativo()" style="display:none;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Compartir
-      </button>
-    </div>
-    <div class="share-note" id="share-note-ig">Para Instagram: descarga la imagen y súbela desde tu móvil.</div>
-  </div>
-</div>
-
-<!-- Tarjeta oculta para captura con html2canvas -->
-<div id="share-card-tpl">
-  <div class="sc-wrap" id="sc-wrap">
-    <div class="sc-header">
-      <span class="sc-logo">La Diva Doméstica</span>
-      <span class="sc-ornament">✦ ✦ ✦</span>
-    </div>
-    <div class="sc-body">
-      <div class="sc-tipo"  id="sc-tipo"></div>
-      <div class="sc-titulo" id="sc-titulo"></div>
-      <div class="sc-texto"  id="sc-texto"></div>
-      <div class="sc-autor"  id="sc-autor"></div>
-    </div>
-    <div class="sc-footer">
-      <span class="sc-url" id="sc-url"></span>
-      <span class="sc-stars">✦ ✦ ✦</span>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
