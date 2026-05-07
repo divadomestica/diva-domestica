@@ -249,6 +249,15 @@
   .respuesta-form { background: var(--cream-dark); border: 1px solid var(--divider); padding: 0.75rem; margin-top: 0.5rem; }
   .respuesta-form textarea { width: 100%; border: 1px solid var(--divider); background: var(--cream); font-family: var(--body); font-size: 0.88rem; color: var(--ink); padding: 0.5rem 0.7rem; resize: vertical; }
   .respuesta-form textarea:focus { outline: none; border-color: var(--wine); }
+
+  /* ── PAGINACIÓN ── */
+  .paginacion { display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 2rem 0 1rem; flex-wrap: wrap; }
+  .pag-btn { font-family: var(--body); font-size: 0.78rem; letter-spacing: 0.1em; background: none; border: 1px solid var(--divider); color: var(--ink-light); padding: 0.45rem 0.8rem; cursor: pointer; transition: all 0.15s; min-width: 36px; text-align: center; }
+  .pag-btn:hover:not(:disabled):not(.pag-activa) { border-color: var(--wine); color: var(--wine); background: var(--wine-pale); }
+  .pag-btn.pag-activa { background: var(--wine); color: var(--cream); border-color: var(--wine); cursor: default; }
+  .pag-btn:disabled { opacity: 0.32; cursor: default; pointer-events: none; }
+  .pag-nav { font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.45rem 1rem; }
+  .pag-puntos { font-family: var(--body); font-size: 0.78rem; color: var(--ink-light); padding: 0 0.2rem; border: none; background: none; cursor: default; }
 </style>
 </head>
 <body>
@@ -327,6 +336,7 @@
       <div class="forum-grid" id="cartas-grid">
         <p style="font-family:var(--body);color:var(--ink-light);font-style:italic;">Cargando cartas...</p>
       </div>
+      <div id="pag-cartas"></div>
     </div>
   </section>
 
@@ -363,6 +373,7 @@
     <div id="archivo-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
       <p style="font-family:var(--body);color:var(--ink-light);font-style:italic;">Cargando ediciones anteriores...</p>
     </div>
+    <div id="pag-archivo"></div>
   </div>
 
   <!-- RECETAS — Sección propia separada del foro -->
@@ -373,6 +384,7 @@
         <p>Secretos culinarios y misterios del fogón — haz clic en una receta para abrirla</p>
       </div>
       <div class="recetas-grid" id="recetas-grid"></div>
+      <div id="pag-recetas"></div>
     </div>
   </section>
 
@@ -390,6 +402,7 @@
     <h2 style="font-family:var(--serif);font-size:1.8rem;font-style:italic;margin-bottom:0.5rem;color:var(--wine);">Recomendaciones Semanales</h2>
     <p style="font-family:var(--fell);font-style:italic;color:var(--ink-light);margin-bottom:0.5rem;">Lo que la diva ha leído, probado y aprobado esta semana.</p>
     <div class="reco-grid" id="recos-grid"></div>
+    <div id="pag-recos"></div>
   </div>
 
   <!-- SOBRE LA DIVA (oculta hasta que haya contenido) -->
@@ -728,8 +741,7 @@
     const bio  = CONFIG.sobre_diva_bio  || '';
     const foto = CONFIG.sobre_diva_foto || '';
     if (bio || foto) {
-      const sobreEl = document.getElementById('sobre');
-      if (sobreEl) { sobreEl.style.display = ''; sobreEl.dataset.tieneContenido = '1'; }
+      document.getElementById('sobre').style.display = '';
       document.getElementById('nav-sobre').style.display = '';
       document.getElementById('sobre-bio').textContent = bio;
       if (foto) {
@@ -794,6 +806,30 @@
     }
   }
 
+  const POR_PAG_ARCHIVO = 8;
+  let _archivoData   = [];
+  let _archivoPagAct = 1;
+
+  function renderArchivo(pagina) {
+    _archivoPagAct = pagina;
+    const g      = document.getElementById('archivo-grid');
+    const total  = _archivoData.length;
+    const totPag = Math.max(1, Math.ceil(total / POR_PAG_ARCHIVO));
+    const pg     = Math.min(Math.max(1, pagina), totPag);
+    _archivoPagAct = pg;
+    const slice  = _archivoData.slice((pg - 1) * POR_PAG_ARCHIVO, pg * POR_PAG_ARCHIVO);
+    // numeración real: la más reciente es la edición más alta
+    const totalColumnas = _archivoData.length; // excluye la activa principal
+    g.innerHTML = slice.map((c, i) => {
+      const numEdicion = totalColumnas - ((pg - 1) * POR_PAG_ARCHIVO + i);
+      return `<div class="sidebar-widget" style="cursor:pointer;" onclick="verArchivoColumna(${c.id})">
+        <h3>Edición n.º ${numEdicion}</h3>
+        <p>${c.titulo || ''}</p>
+      </div>`;
+    }).join('');
+    buildPaginacion('pag-archivo', pg, totPag, p => { renderArchivo(p); document.getElementById('archivo').scrollIntoView({ behavior:'smooth', block:'start' }); });
+  }
+
   async function cargarArchivo() {
     try {
       const r = await fetch(`${SB}/rest/v1/columnas?activa=eq.true&order=created_at.desc`, { headers: GH });
@@ -803,11 +839,8 @@
         g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);font-style:italic;">Las ediciones anteriores aparecerán aquí.</p>';
         return;
       }
-      g.innerHTML = d.slice(1).map((c, i) => `
-        <div class="sidebar-widget" style="cursor:pointer;" onclick="verArchivoColumna(${c.id})">
-          <h3>Edición n.º ${d.length - 1 - i}</h3>
-          <p>${c.titulo || ''}</p>
-        </div>`).join('');
+      _archivoData = d.slice(1); // excluir la columna más reciente (la principal)
+      renderArchivo(1);
     } catch(e) {}
   }
 
@@ -829,11 +862,70 @@
     } catch(e) {}
   }
 
-  // ── CARTAS ──
+  // ── CARTAS con paginación ──
   const LIMITE_CARTA = 180;
   const LIMITE_RESP  = 120;
 
   function toggleLeerMas(btn) {
+    const body = btn.previousElementSibling;
+    const full = body.dataset.full;
+    const expanded = body.dataset.expanded === 'true';
+    if (expanded) {
+      body.textContent = full.slice(0, LIMITE_CARTA) + '…';
+      body.dataset.expanded = 'false';
+      btn.textContent = 'Leer más ✦';
+    } else {
+      body.textContent = full;
+      body.dataset.expanded = 'true';
+      btn.textContent = 'Leer menos ✦';
+    }
+  }
+  const POR_PAG_CARTAS = 9;
+  let _cartasData   = [];
+  let _cartasPagAct = 1;
+  let _cartasFiltro = 'all';
+
+  function renderCartas(pagina) {
+    _cartasPagAct = pagina;
+    const g = document.getElementById('cartas-grid');
+    const datos = _cartasFiltro === 'all'
+      ? _cartasData
+      : _cartasData.filter(c => c.categoria === _cartasFiltro);
+    const total  = datos.length;
+    const totPag = Math.max(1, Math.ceil(total / POR_PAG_CARTAS));
+    const pg     = Math.min(Math.max(1, pagina), totPag);
+    _cartasPagAct = pg;
+    const slice  = datos.slice((pg - 1) * POR_PAG_CARTAS, pg * POR_PAG_CARTAS);
+    g.innerHTML  = '';
+    if (!slice.length) {
+      g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);font-style:italic;padding:1rem;">No hay cartas en esta categoría.</p>';
+    } else {
+      slice.forEach(row => g.appendChild(buildCarta(row)));
+    }
+    buildPaginacion('pag-cartas', pg, totPag, p => { renderCartas(p); document.getElementById('foro').scrollIntoView({ behavior:'smooth', block:'start' }); });
+  }
+
+  async function cargarCartas() {
+    const g = document.getElementById('cartas-grid');
+    g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);font-style:italic;padding:1rem;">Cargando cartas...</p>';
+    try {
+      const r = await fetch(`${SB}/rest/v1/cartas?order=destacada.desc,created_at.desc`, { headers: GH });
+      const d = await r.json();
+      if (!Array.isArray(d) || !d.length) {
+        g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);font-style:italic;padding:1rem;">Aún no hay cartas. ¡Sé la primera en escribir!</p>';
+        return;
+      }
+      const tieneAprobacion = d.some(c => c.aprobada !== null && c.aprobada !== undefined);
+      _cartasData = tieneAprobacion ? d.filter(c => c.aprobada === true) : d;
+      if (!_cartasData.length) {
+        g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);font-style:italic;padding:1rem;">Aún no hay cartas aprobadas.</p>';
+        return;
+      }
+      renderCartas(1);
+    } catch(e) {
+      g.innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);padding:1rem;">Error cargando cartas.</p>';
+    }
+  }
     const body = btn.previousElementSibling;
     const full = body.dataset.full;
     const expanded = body.dataset.expanded === 'true';
@@ -973,7 +1065,33 @@
   }
 
   // ── RECETAS ──
-  let _recetasData = [];
+  let _recetasData   = [];
+  let _recetasPagAct = 1;
+  const POR_PAG_RECETAS = 9;
+
+  function renderRecetas(pagina) {
+    _recetasPagAct = pagina;
+    const g      = document.getElementById('recetas-grid');
+    const total  = _recetasData.length;
+    const totPag = Math.max(1, Math.ceil(total / POR_PAG_RECETAS));
+    const pg     = Math.min(Math.max(1, pagina), totPag);
+    _recetasPagAct = pg;
+    const slice  = _recetasData.slice((pg - 1) * POR_PAG_RECETAS, pg * POR_PAG_RECETAS);
+    g.innerHTML  = slice.map(rec => `
+      <div class="receta-card" onclick="abrirReceta(${rec.id})">
+        <div class="receta-foto-wrap">
+          ${rec.foto_url
+            ? `<img src="${rec.foto_url}" class="receta-foto" alt="${rec.titulo}" onerror="this.parentElement.innerHTML='<span class=receta-foto-placeholder>✦</span>'">`
+            : `<span class="receta-foto-placeholder">✦</span>`}
+        </div>
+        <div class="receta-card-body">
+          <div class="receta-titulo">${rec.titulo}</div>
+          <div class="receta-desc">${rec.descripcion || ''}</div>
+          <span class="receta-ver">Ver receta →</span>
+        </div>
+      </div>`).join('');
+    buildPaginacion('pag-recetas', pg, totPag, p => { renderRecetas(p); document.getElementById('recetas').scrollIntoView({ behavior:'smooth', block:'start' }); });
+  }
 
   async function cargarRecetas() {
     try {
@@ -981,21 +1099,8 @@
       const d = await r.json();
       if (!Array.isArray(d) || !d.length) return;
       _recetasData = d;
-      // Solo mostrar el enlace del nav — la sección se abre al hacer clic
       document.getElementById('nav-recetas').style.display = '';
-      document.getElementById('recetas-grid').innerHTML = d.map(rec => `
-        <div class="receta-card" onclick="abrirReceta(${rec.id})">
-          <div class="receta-foto-wrap">
-            ${rec.foto_url
-              ? `<img src="${rec.foto_url}" class="receta-foto" alt="${rec.titulo}" onerror="this.parentElement.innerHTML='<span class=receta-foto-placeholder>✦</span>'">`
-              : `<span class="receta-foto-placeholder">✦</span>`}
-          </div>
-          <div class="receta-card-body">
-            <div class="receta-titulo">${rec.titulo}</div>
-            <div class="receta-desc">${rec.descripcion || ''}</div>
-            <span class="receta-ver">Ver receta →</span>
-          </div>
-        </div>`).join('');
+      renderRecetas(1);
     } catch(e) {}
   }
 
@@ -1030,94 +1135,59 @@
   }
 
   // ── RECOMENDACIONES ──
+  let _recosData   = [];
+  let _recosPagAct = 1;
+  const POR_PAG_RECOS = 9;
+
+  function renderRecos(pagina) {
+    _recosPagAct = pagina;
+    const g      = document.getElementById('recos-grid');
+    const total  = _recosData.length;
+    const totPag = Math.max(1, Math.ceil(total / POR_PAG_RECOS));
+    const pg     = Math.min(Math.max(1, pagina), totPag);
+    _recosPagAct = pg;
+    const slice  = _recosData.slice((pg - 1) * POR_PAG_RECOS, pg * POR_PAG_RECOS);
+    g.innerHTML  = slice.map(rec => `
+      <div class="reco-card">
+        ${rec.semana ? `<div class="reco-semana">${rec.semana}</div>` : ''}
+        <div class="reco-titulo">${rec.titulo}</div>
+        <div class="reco-desc">${rec.descripcion || ''}</div>
+        ${rec.url ? `<a href="${rec.url}" target="_blank" rel="noopener" class="reco-url">Ver →</a>` : ''}
+      </div>`).join('');
+    buildPaginacion('pag-recos', pg, totPag, p => { renderRecos(p); document.getElementById('recomendaciones').scrollIntoView({ behavior:'smooth', block:'start' }); });
+  }
+
   async function cargarRecomendaciones() {
     try {
       const r = await fetch(`${SB}/rest/v1/recomendaciones?activa=eq.true&order=created_at.desc`, { headers: GH });
       const d = await r.json();
       if (!Array.isArray(d) || !d.length) return;
-      // Solo mostrar el enlace del nav — la sección se abre al hacer clic
+      _recosData = d;
       document.getElementById('nav-recos').style.display = '';
-      document.getElementById('recos-grid').innerHTML = d.map(rec => `
-        <div class="reco-card">
-          ${rec.semana ? `<div class="reco-semana">${rec.semana}</div>` : ''}
-          <div class="reco-titulo">${rec.titulo}</div>
-          <div class="reco-desc">${rec.descripcion || ''}</div>
-          ${rec.url ? `<a href="${rec.url}" target="_blank" rel="noopener" class="reco-url">Ver →</a>` : ''}
-        </div>`).join('');
+      renderRecos(1);
     } catch(e) {}
   }
 
-  // ── FILTROS ──
+  // ── FILTROS — al filtrar cartas, volvemos a pág 1 ──
   document.querySelectorAll('.filter-btn').forEach(b => {
     b.addEventListener('click', function() {
       document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
       this.classList.add('active');
-      const f = this.dataset.filter;
-      document.querySelectorAll('.carta').forEach(c => { c.style.display = (f === 'all' || c.dataset.tag === f) ? '' : 'none'; });
+      _cartasFiltro = this.dataset.filter;
+      renderCartas(1);
     });
   });
 
-  // ── NAV — SISTEMA DE VISTAS ──
-  // Secciones que forman la "vista normal" (página principal)
-  const SECCIONES_NORMALES = ['columna', 'foro', 'escribir', 'archivo', 'sobre'];
-  // Secciones que son "vistas exclusivas" (ocultan todo lo demás)
-  const VISTAS_EXCLUSIVAS  = { recetas: 'recetas', recomendaciones: 'recomendaciones' };
-
-  function activarVistaExclusiva(seccionId) {
-    // Ocultar todas las secciones normales
-    SECCIONES_NORMALES.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-    // Ocultar otras vistas exclusivas
-    Object.keys(VISTAS_EXCLUSIVAS).forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = id === seccionId ? '' : 'none';
-    });
-    // Scroll al inicio suave
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function activarVistaNormal(anchorId) {
-    // Mostrar todas las secciones normales
-    SECCIONES_NORMALES.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      // "sobre" solo se muestra si tiene contenido (controlado por aplicarConfig)
-      if (id === 'sobre' && !el.dataset.tieneContenido) return;
-      el.style.display = '';
-    });
-    // Ocultar vistas exclusivas
-    Object.keys(VISTAS_EXCLUSIVAS).forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-    // Scroll a la sección pedida
-    if (anchorId) {
-      setTimeout(() => {
-        const t = document.getElementById(anchorId);
-        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 50);
-    }
-  }
-
+  // ── NAV ──
   document.querySelectorAll('nav a').forEach(a => {
     a.addEventListener('click', function(e) {
       e.preventDefault();
       document.querySelectorAll('nav a').forEach(x => x.classList.remove('active'));
       this.classList.add('active');
-
-      const href      = this.getAttribute('href');
-      const seccionId = href ? href.replace('#', '') : '';
-
-      if (VISTAS_EXCLUSIVAS[seccionId] !== undefined) {
-        activarVistaExclusiva(seccionId);
-      } else {
-        activarVistaNormal(seccionId);
-      }
+      const t = document.querySelector(this.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
-
 
   // ══════════════════════════════════════════════
   //  ADMIN
@@ -1549,6 +1619,62 @@
 
   // cargar form sobre al abrir tab
   document.querySelector('[onclick="switchTab(\'tab-sobre\',this)"]').addEventListener('click', cargarFormSobre);
+
+  // ══════════════════════════════════════════════
+  //  PAGINACIÓN — función reutilizable
+  // ══════════════════════════════════════════════
+  const _pagCallbacks = {}; // registro de callbacks por contenedor
+
+  function buildPaginacion(contenedorId, pagActual, totalPags, onCambio) {
+    const wrap = document.getElementById(contenedorId);
+    if (!wrap) return;
+    _pagCallbacks[contenedorId] = onCambio; // guardar callback
+    if (totalPags <= 1) { wrap.innerHTML = ''; return; }
+
+    const MAX_NUMS = 5;
+    let inicio, fin;
+    if (totalPags <= MAX_NUMS) {
+      inicio = 1; fin = totalPags;
+    } else {
+      let mitad = Math.floor(MAX_NUMS / 2);
+      inicio = pagActual - mitad;
+      fin    = pagActual + mitad;
+      if (inicio < 1)      { inicio = 1; fin = MAX_NUMS; }
+      if (fin > totalPags) { fin = totalPags; inicio = totalPags - MAX_NUMS + 1; }
+    }
+
+    const fn = `_pagCallbacks['${contenedorId}']`;
+    const botones = [];
+
+    botones.push(
+      `<button class="pag-btn pag-nav"${pagActual === 1 ? ' disabled' : ''}
+        onclick="${fn}(${pagActual - 1})">← Anterior</button>`
+    );
+
+    if (inicio > 1) {
+      botones.push(`<button class="pag-btn" onclick="${fn}(1)">1</button>`);
+      if (inicio > 2) botones.push(`<span class="pag-puntos">…</span>`);
+    }
+
+    for (let i = inicio; i <= fin; i++) {
+      botones.push(
+        `<button class="pag-btn${i === pagActual ? ' pag-activa' : ''}"
+          onclick="${fn}(${i})">${i}</button>`
+      );
+    }
+
+    if (fin < totalPags) {
+      if (fin < totalPags - 1) botones.push(`<span class="pag-puntos">…</span>`);
+      botones.push(`<button class="pag-btn" onclick="${fn}(${totalPags})">${totalPags}</button>`);
+    }
+
+    botones.push(
+      `<button class="pag-btn pag-nav"${pagActual === totalPags ? ' disabled' : ''}
+        onclick="${fn}(${pagActual + 1})">Siguiente →</button>`
+    );
+
+    wrap.innerHTML = `<div class="paginacion">${botones.join('')}</div>`;
+  }
 
   // ── INIT ──
   cargarConfig().then(() => {
