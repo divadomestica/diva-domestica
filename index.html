@@ -284,9 +284,54 @@
 .header.has-photo .header-rule {
   visibility: hidden !important;
 }
+
+/* Pantalla de carga con GIF de escoba y fondo blanco */
+body.loading {
+  visibility: hidden;
+}
+
+body.loading::after {
+  content: "";
+  visibility: visible;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background-image: url('https://www.gifsanimados.org/data/media/1582/barrer-imagen-animada-0001.gif');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 9999;
+  animation: barrer 0.8s ease-in-out infinite;
+}
+
+body.loading::before {
+  content: "La diva llegará pronto...";
+  visibility: visible;
+  position: fixed;
+  top: calc(50% + 70px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #8A6674;
+  background: transparent;
+  padding: 0;
+  z-index: 9999;
+  white-space: nowrap;
+}
+
+@keyframes barrer {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  50% { transform: translate(-50%, -50%) rotate(10deg); }
+  100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
 </style>
 </head>
-<body>
+<body class="loading">
 
 <div class="masthead" id="masthead-text">✦ &nbsp; Publicación semanal &nbsp; · &nbsp; Vida doméstica con misterio &nbsp; · &nbsp; Para divas de todos los hogares &nbsp; ✦</div>
 
@@ -744,7 +789,7 @@
   };
 
   const PALETA_SECUNDARIA = {
-    color_wine: '#7B9CBF',
+    color_wine: '#5A7D9E',
     color_wine_light: '#9BB0C4',
     color_wine_pale: '#E8F0F5',
     color_gold: '#C5D5EA',
@@ -826,8 +871,13 @@
     d.forEach(row => { CONFIG[row.clave] = row.valor; });
     console.log('🎨 CONFIG cargada desde Supabase:', CONFIG);
     aplicarConfig();
-  } catch(e) { console.error('Config error', e); }
-}
+  } catch(e) { 
+    console.error('Config error', e);
+  } finally {
+    // Quitar la clase loading cuando termine (éxito o error)
+    document.body.classList.remove('loading');
+  }
+  
 
   // ── Alineaciones de sección (definidas antes de aplicarConfig) ──
   const SEC_ALIGN_DEFS = [
@@ -1194,7 +1244,15 @@ function aplicarConfig() {
       const sm = document.getElementById('success-msg');
       sm.style.display = 'block'; setTimeout(() => sm.style.display = 'none', 5000);
       notif('✦ Tu carta ha sido recibida. La diva la revisará con distinción.');
-    } catch(e) { console.error(e); notif('Error al enviar. Abre la consola (F12) para ver los detalles.'); }
+    } catch(e) {
+      console.error(e);
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. Tu carta no pudo enviarse.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red: no se pudo conectar al servidor. Verifica tu conexión.'
+          : 'Error del servidor al enviar la carta. Inténtalo de nuevo.';
+      notif(msgError);
+    }
     finally { btn.textContent = 'Enviar carta ✦'; btn.disabled = false; }
   }
 
@@ -1463,7 +1521,14 @@ function aplicarConfig() {
         }
       }
       setMsg('msg-alineaciones', '✦ Alineaciones guardadas.');
-    } catch(e) { setMsg('msg-alineaciones', 'Error al guardar alineaciones.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. No se guardaron las alineaciones.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red al guardar. Verifica tu conexión.'
+          : 'Error del servidor al guardar alineaciones. Revisa la consola (F12).';
+      setMsg('msg-alineaciones', msgError);
+    }
   }
 
   // ── Admin: Diseño — Colores y Fuentes ──
@@ -1482,16 +1547,41 @@ function aplicarConfig() {
     const btn = document.getElementById('btn-publicar');
     btn.textContent = 'Publicando...'; btn.disabled = true;
     try {
-      const r = await fetch(`${SB}/rest/v1/columnas`, {
+      // Intento principal: con cita_posicion (requiere que exista la columna en Supabase)
+      let r = await fetch(`${SB}/rest/v1/columnas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
         body: JSON.stringify({ titulo, kicker, byline, contenido, activa: true, foto_url, cita, cita_autor, cita_posicion })
       });
-      const txt = await r.text();
-      if (!r.ok) { console.error(txt); throw new Error(txt); }
+      // Si falla por columna inexistente (error 42703 o 400), reintenta sin cita_posicion
+      if (!r.ok) {
+        const txt = await r.text();
+        const esMissingCol = txt.includes('cita_posicion') || txt.includes('42703') || r.status === 400;
+        if (esMissingCol) {
+          console.warn('⚠️ La columna cita_posicion no existe en la tabla. Publicando sin ella. Agrégala con: ALTER TABLE columnas ADD COLUMN cita_posicion TEXT;');
+          r = await fetch(`${SB}/rest/v1/columnas`, {
+            method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
+            body: JSON.stringify({ titulo, kicker, byline, contenido, activa: true, foto_url, cita, cita_autor })
+          });
+        }
+        if (!r.ok) {
+          const txt2 = await r.text();
+          console.error(txt2);
+          throw new Error(txt2);
+        }
+      }
       ['a-titulo','a-kicker','a-byline','a-contenido','a-foto','a-cita','a-cita-autor','a-cita-pos-parrafo'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('cita-pos-final').checked = true;      setMsg('msg-col', '✦ Columna publicada con éxito.');
+      document.getElementById('cita-pos-final').checked = true;
+      setMsg('msg-col', '✦ Columna publicada con éxito.');
       await Promise.all([cargarColumna(), cargarArchivo(), cargarListaColumnas()]);
-    } catch(e) { console.error(e); setMsg('msg-col', 'Error al publicar. Abre la consola (F12) para ver los detalles.'); }
+    } catch(e) {
+      console.error(e);
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red: no se pudo conectar al servidor. Verifica tu conexión.'
+          : 'Error del servidor al publicar. Abre la consola (F12) para ver los detalles.';
+      setMsg('msg-col', msgError);
+    }
     finally { btn.textContent = 'Publicar columna ✦'; btn.disabled = false; }
   }
 
@@ -1654,7 +1744,14 @@ function aplicarConfig() {
         if (val) await setConfig(def.key, val);
       }
       setMsg('msg-colores', '✦ Colores guardados.');
-    } catch(e) { setMsg('msg-colores', 'Error al guardar colores.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. No se guardaron los colores.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red al guardar. Verifica tu conexión.'
+          : 'Error del servidor al guardar colores. Revisa la consola (F12).';
+      setMsg('msg-colores', msgError);
+    }
   }
 
   function previewFuente() {
@@ -1686,7 +1783,14 @@ function aplicarConfig() {
       document.documentElement.style.setProperty('--serif', `'${ft}', Georgia, serif`);
       document.documentElement.style.setProperty('--body',  `'${fc}', Georgia, serif`);
       setMsg('msg-fuentes', '✦ Tipografía guardada y aplicada.');
-    } catch(e) { setMsg('msg-fuentes', 'Error al guardar fuentes.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. No se guardó la tipografía.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red al guardar. Verifica tu conexión.'
+          : 'Error del servidor al guardar fuentes. Revisa la consola (F12).';
+      setMsg('msg-fuentes', msgError);
+    }
   }
 
   // ── Admin: Textos ──
@@ -1722,7 +1826,14 @@ function aplicarConfig() {
       // Actualizar en vivo
       await cargarConfig();
       setMsg('msg-textos', '✦ Textos guardados y aplicados.');
-    } catch(e) { setMsg('msg-textos', 'Error al guardar textos.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. No se guardaron los textos.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red al guardar. Verifica tu conexión.'
+          : 'Error del servidor al guardar textos. Revisa la consola (F12).';
+      setMsg('msg-textos', msgError);
+    }
   }
 
   // ── Admin: Recetas ──
@@ -1743,7 +1854,14 @@ function aplicarConfig() {
       ['rec-titulo','rec-desc','rec-ingredientes','rec-toque-diva','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-receta', '✦ Receta publicada.');
       await Promise.all([cargarListaRecetas(), cargarRecetas()]);
-    } catch(e) { setMsg('msg-receta', 'Error al publicar receta.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red: no se pudo conectar al servidor.'
+          : 'Error del servidor al publicar la receta. Revisa la consola (F12).';
+      setMsg('msg-receta', msgError);
+    }
   }
 
   async function cargarListaRecetas() {
@@ -1782,7 +1900,14 @@ function aplicarConfig() {
       ['reco-titulo','reco-desc','reco-semana','reco-url'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-reco', '✦ Recomendación publicada.');
       await Promise.all([cargarListaRecos(), cargarRecomendaciones()]);
-    } catch(e) { setMsg('msg-reco', 'Error al publicar recomendación.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. Verifica tu red e inténtalo de nuevo.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red: no se pudo conectar al servidor.'
+          : 'Error del servidor al publicar la recomendación. Revisa la consola (F12).';
+      setMsg('msg-reco', msgError);
+    }
   }
 
   async function cargarListaRecos() {
@@ -1859,7 +1984,14 @@ function aplicarConfig() {
       await setConfig('sobre_borde_grosor', grosor);
       await cargarConfig();
       setMsg('msg-sobre', '✦ Perfil guardado y publicado.');
-    } catch(e) { setMsg('msg-sobre', 'Error al guardar.'); }
+    } catch(e) {
+      const msgError = !navigator.onLine
+        ? 'Sin conexión a Internet. No se guardó el perfil.'
+        : (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))
+          ? 'Error de red al guardar. Verifica tu conexión.'
+          : 'Error del servidor al guardar el perfil. Revisa la consola (F12).';
+      setMsg('msg-sobre', msgError);
+    }
   }
 
   // cargar form sobre al abrir tab
