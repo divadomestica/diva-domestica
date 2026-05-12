@@ -18,24 +18,28 @@
     --fell: 'IM Fell English', Georgia, serif;
   }
   html { scroll-behavior: smooth; }
-  body { background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.75; min-height: 100vh; }
+  body { background: var(--cream); color: var(--ink); font-family: var(--body); font-size: 18px; line-height: 1.75; min-height: 100vh; display: flex; flex-direction: column; }
+  main { flex: 1; }
 
   .masthead { background: var(--ink); color: var(--cream); text-align: center; padding: 0.35rem 2rem; font-family: var(--body); font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase; }
 
   .header { background: var(--cream-dark); border-bottom: 2px solid var(--ink); padding: 2.5rem 2rem 1.5rem; text-align: center; position: relative; overflow: hidden; transition: background 0.3s; }
-  .header.has-photo { background-size: cover; background-position: center; background-repeat: no-repeat; padding: 4rem 2rem 2.5rem; }
-  .header.has-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(46,36,40,0.45) 0%, rgba(46,36,40,0.6) 100%); z-index: 0; }
+  .header-ornament, .header h1, .header-sub, .header-rule { position: relative; z-index: 1; }
+  .header-bg-photo { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 2; }
+  .header.has-photo .header-bg-photo { display: block; }
   .header.has-photo .header-ornament,
   .header.has-photo h1,
   .header.has-photo .header-sub,
-  .header.has-photo .header-rule { position: relative; z-index: 1; }
+  .header.has-photo .header-rule { z-index: 4; }
+  .header.has-photo { padding: 4rem 2rem 2.5rem; }
+  .header.has-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(46,36,40,0.45) 0%, rgba(46,36,40,0.6) 100%); z-index: 3; }
   .header.has-photo h1 { color: var(--cream); }
   .header.has-photo h1 em { color: var(--gold); }
   .header.has-photo .header-sub { color: rgba(250,248,247,0.85); }
   .header.has-photo .header-rule::before,
   .header.has-photo .header-rule::after { background: var(--cream); opacity: 0.5; }
   .header.has-photo .header-ornament { color: var(--gold); }
-  .header::before, .header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(180deg, var(--ink) 0px, var(--ink) 6px, transparent 6px, transparent 12px); z-index: 1; }
+  .header::before, .header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(180deg, var(--ink) 0px, var(--ink) 6px, transparent 6px, transparent 12px); z-index: 5; }
   .header.has-photo::before, .header.has-photo::after { background: repeating-linear-gradient(180deg, rgba(250,248,247,0.4) 0px, rgba(250,248,247,0.4) 6px, transparent 6px, transparent 12px); }
   .header::before { left: 1.5rem; } .header::after { right: 1.5rem; }
   .header-ornament { font-size: 1.1rem; color: var(--gold); letter-spacing: 0.4em; margin-bottom: 0.5rem; display: block; }
@@ -71,7 +75,7 @@
 
   .pull-quote { border-left: 3px solid var(--gold); margin: 1.5rem 0; padding: 0.75rem 1.25rem; background: var(--gold-pale); }
   .pull-quote blockquote { font-family: var(--serif); font-size: 1.15rem; font-style: italic; color: var(--wine); line-height: 1.5; margin-bottom: 0.3rem; }
-  .pull-quote cite { font-family: var(--fell); font-size: 0.8rem; color: var(--ink-light); font-style: italic; }
+  .pull-quote cite { font-family: var(--serif); font-size: 0.72rem; color: var(--ink-light); font-style: normal; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; }
 
   .cover-photo { width: 100%; max-height: 300px; object-fit: cover; margin-bottom: 1.5rem; border: 1px solid var(--divider); }
 
@@ -153,10 +157,10 @@
   .sobre-bio { font-family: var(--body); font-size: 1.05rem; line-height: 1.85; color: var(--ink); }
 
   /* RECETAS */
-  .recetas-section { background: var(--cream-dark); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 2.5rem 0; margin-bottom: 3rem; }
-  .recetas-header { text-align: center; margin-bottom: 2rem; }
+  .recetas-section { background: var(--cream); padding: 2.5rem 0; margin-bottom: 0; min-height: calc(100vh - 200px); }
+  .recetas-header { text-align: center; margin-bottom: 0; }
   .recetas-header h2 { font-family: var(--serif); font-size: 2rem; font-weight: 700; font-style: italic; margin-bottom: 0.3rem; }
-  .recetas-header p { font-family: var(--fell); font-style: italic; font-size: 0.9rem; color: var(--ink-light); }
+  .recetas-header p { font-family: var(--fell); font-style: italic; font-size: 0.9rem; color: var(--ink-light); margin-bottom: 0; }
   .recetas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
   .receta-card { background: var(--cream); border: 1px solid var(--divider); cursor: pointer; transition: border-color 0.2s, transform 0.2s; overflow: hidden; }
   .receta-card:hover { border-color: var(--wine); transform: translateY(-2px); }
@@ -187,13 +191,24 @@
   .receta-paso { font-family: var(--body); font-size: 0.95rem; line-height: 1.75; color: var(--ink); margin-bottom: 0.6rem; display: flex; gap: 0.75rem; }
   .receta-paso-num { font-family: var(--serif); font-weight: 700; color: var(--wine); font-size: 1.1rem; flex-shrink: 0; min-width: 1.5rem; }
 
-  /* RECOMENDACIONES */
+  .receta-toque-diva { margin-top: 1.5rem; margin-bottom: 0.5rem; padding: 1rem 1.25rem; background: var(--wine-pale); border-left: 3px solid var(--wine); }
+  .receta-toque-diva h4 { font-family: var(--fell); font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--wine); border-bottom: 1px solid var(--divider); padding-bottom: 0.4rem; margin-bottom: 0.75rem; }
+  .receta-toque-diva p { font-family: var(--body); font-size: 0.95rem; line-height: 1.75; color: var(--ink); font-style: italic; }
   .reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 1.5rem; }
   .reco-card { border-left: 3px solid var(--gold); padding: 0.75rem 1rem; background: var(--gold-pale); }
   .reco-semana { font-family: var(--body); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--wine); margin-bottom: 0.25rem; }
   .reco-titulo { font-family: var(--serif); font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
   .reco-desc { font-family: var(--body); font-size: 0.85rem; color: var(--ink-light); line-height: 1.5; }
   .reco-url { display: inline-block; margin-top: 0.5rem; font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.12em; color: var(--wine); text-decoration: none; text-transform: uppercase; border-bottom: 1px solid var(--wine); }
+
+  /* Alineación dinámica de cabeceras de sección */
+  .sec-align-left  { text-align: left !important; }
+  .sec-align-center { text-align: center !important; }
+  .sec-align-right  { text-align: right !important; }
+  .ornament-divider.sec-align-left  { justify-content: flex-start; }
+  .ornament-divider.sec-align-right { justify-content: flex-end; }
+  /* posición del separador */
+  .sec-header-wrap { display: flex; flex-direction: column; }
 
   footer { background: var(--ink); color: var(--divider); padding: 2rem; text-align: center; }
   .footer-logo { font-family: var(--serif); font-size: 1.4rem; font-style: italic; color: var(--gold); margin-bottom: 0.5rem; }
@@ -256,6 +271,7 @@
 <div class="masthead" id="masthead-text">✦ &nbsp; Publicación semanal &nbsp; · &nbsp; Vida doméstica con misterio &nbsp; · &nbsp; Para divas de todos los hogares &nbsp; ✦</div>
 
 <header class="header">
+  <img id="header-bg-img" class="header-bg-photo" src="" alt="">
   <span class="header-ornament">— ✦ —</span>
   <h1 id="header-nombre">La <em>Diva</em> Doméstica</h1>
   <p class="header-sub" id="header-subtitulo">Columna de vida, misterios y elegancia cotidiana</p>
@@ -312,9 +328,9 @@
 
   <section class="forum-section" id="foro">
     <div class="container">
-      <div class="forum-header">
-        <h2>Cartas de las Lectoras</h2>
-        <p>Misivas, confesiones y misterios del hogar enviados por nuestra comunidad</p>
+      <div class="forum-header" id="sec-foro-header">
+        <h2 id="sec-foro-titulo">Cartas de las Lectoras</h2>
+        <p id="sec-foro-desc">Misivas, confesiones y misterios del hogar enviados por nuestra comunidad</p>
       </div>
       <div class="filter-bar">
         <span>Filtrar:</span>
@@ -368,10 +384,11 @@
   <!-- RECETAS — Sección propia separada del foro -->
   <section class="recetas-section" id="recetas" style="display:none;">
     <div class="container">
-      <div class="recetas-header">
-        <h2>Recetas de la Diva</h2>
-        <p>Secretos culinarios y misterios del fogón — haz clic en una receta para abrirla</p>
+      <div class="recetas-header" id="sec-recetas-header">
+        <h2 id="sec-recetas-titulo">Recetas de la Diva</h2>
+        <p id="sec-recetas-desc">Secretos culinarios y misterios del fogón — haz clic en una receta para abrirla</p>
       </div>
+      <div class="ornament-divider" id="sec-recetas-divider" style="margin:1.5rem 0;"><span class="icon">✦ ✦ ✦</span></div>
       <div class="recetas-grid" id="recetas-grid"></div>
     </div>
   </section>
@@ -385,18 +402,18 @@
   </div>
 
   <!-- RECOMENDACIONES (oculta hasta que haya contenido) -->
-  <div class="container" id="recomendaciones" style="margin-bottom:3rem;display:none;">
-    <div class="ornament-divider"><span class="icon">✦ ✦ ✦</span></div>
-    <h2 style="font-family:var(--serif);font-size:1.8rem;font-style:italic;margin-bottom:0.5rem;color:var(--wine);">Recomendaciones Semanales</h2>
-    <p style="font-family:var(--fell);font-style:italic;color:var(--ink-light);margin-bottom:0.5rem;">Lo que la diva ha leído, probado y aprobado esta semana.</p>
+  <div class="container" id="recomendaciones" style="margin-bottom:0;padding-bottom:3rem;min-height:calc(100vh - 200px);display:none;">
+    <div class="ornament-divider" id="sec-recos-divider"><span class="icon">✦ ✦ ✦</span></div>
+    <h2 id="sec-recos-titulo" style="font-family:var(--serif);font-size:1.8rem;font-style:italic;margin-bottom:0.5rem;color:var(--wine);">Recomendaciones Semanales</h2>
+    <p id="sec-recos-desc" style="font-family:var(--fell);font-style:italic;color:var(--ink-light);margin-bottom:0.5rem;">Lo que la diva ha leído, probado y aprobado esta semana.</p>
     <div class="reco-grid" id="recos-grid"></div>
   </div>
 
   <!-- SOBRE LA DIVA (oculta hasta que haya contenido) -->
   <section class="sobre-section" id="sobre" style="display:none;">
     <div class="container">
-      <div class="ornament-divider"><span class="icon">✦ ✦ ✦</span></div>
-      <h2 style="font-family:var(--serif);font-size:1.8rem;font-style:italic;margin-bottom:1.5rem;color:var(--wine);">Sobre la Diva</h2>
+      <div class="ornament-divider" id="sec-sobre-divider"><span class="icon">✦ ✦ ✦</span></div>
+      <h2 id="sec-sobre-titulo" style="font-family:var(--serif);font-size:1.8rem;font-style:italic;margin-bottom:1.5rem;color:var(--wine);">Sobre la Diva</h2>
       <div class="sobre-inner" id="sobre-inner">
         <div class="sobre-foto-placeholder">✦</div>
         <p class="sobre-bio" id="sobre-bio"></p>
@@ -470,6 +487,17 @@
           <input type="text" id="a-cita" class="a-input" placeholder="La frase más elegante de la columna">
           <label class="a-label">Atribución de la cita</label>
           <input type="text" id="a-cita-autor" class="a-input" placeholder="— La Diva Doméstica">
+          <label class="a-label">Posición de la cita</label>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem;margin-bottom:0.5rem;">
+            <label style="font-family:var(--body);font-size:0.82rem;color:var(--ink-light);display:flex;align-items:center;gap:0.35rem;cursor:pointer;">
+              <input type="radio" name="cita-pos" id="cita-pos-final" value="final" checked> Al final del artículo
+            </label>
+            <label style="font-family:var(--body);font-size:0.82rem;color:var(--ink-light);display:flex;align-items:center;gap:0.35rem;cursor:pointer;">
+              <input type="radio" name="cita-pos" id="cita-pos-inicio" value="inicio"> Al inicio
+            </label>
+          </div>
+          <label class="a-label">O insertar después del párrafo n.º (deja en blanco para usar la posición arriba)</label>
+          <input type="number" id="a-cita-pos-parrafo" class="a-input" placeholder="Ej: 2 → después del 2.º párrafo" min="1" style="max-width:320px;">
           <label class="a-label">Contenido — separa párrafos con una línea en blanco</label>
           <textarea id="a-contenido" class="a-input" rows="12" style="margin-top:0.3rem;" placeholder="Escribe aquí el texto de tu columna.&#10;&#10;Deja una línea en blanco entre párrafos.&#10;&#10;El primer párrafo tendrá la letra capital decorativa automáticamente."></textarea>
           <button class="a-btn" id="btn-publicar" onclick="publicarColumna()">Publicar columna ✦</button>
@@ -493,6 +521,17 @@
 
       <!-- ── TAB: DISEÑO ── -->
       <div id="tab-diseno" class="admin-pane">
+        <div class="admin-box">
+          <div class="admin-title">✦ Alineación de secciones</div>
+          <p style="font-family:var(--body);font-size:0.82rem;color:var(--ink-light);margin-bottom:1rem;font-style:italic;">Mueve el título, descripción y separador de cada sección.</p>
+
+          <div id="sec-align-controls">
+            <!-- se genera dinámicamente -->
+          </div>
+          <button class="a-btn" onclick="guardarAlineaciones()">Guardar alineaciones ✦</button>
+          <div class="a-msg" id="msg-alineaciones"></div>
+        </div>
+
         <div class="admin-box">
           <div class="admin-title">✦ Paleta de colores</div>
           <div id="color-pickers">
@@ -568,6 +607,8 @@
           <input type="text" id="rec-desc" class="a-input" placeholder="Un breve párrafo seductor">
           <label class="a-label">Ingredientes</label>
           <textarea id="rec-ingredientes" class="a-input" rows="4" placeholder="Un ingrediente por línea"></textarea>
+          <label class="a-label">Toque de la Diva (párrafo especial, en cursiva)</label>
+          <textarea id="rec-toque-diva" class="a-input" rows="3" placeholder="El toque secreto y elegante que marca la diferencia..."></textarea>
           <label class="a-label">Pasos</label>
           <textarea id="rec-pasos" class="a-input" rows="5" placeholder="Un paso por línea"></textarea>
           <label class="a-label">URL foto (opcional)</label>
@@ -685,6 +726,54 @@
     } catch(e) { console.error('Config error', e); }
   }
 
+  // ── Alineaciones de sección (definidas antes de aplicarConfig) ──
+  const SEC_ALIGN_DEFS = [
+    { key: 'sec_recos',   label: 'Recomendaciones',  tituloId: 'sec-recos-titulo',   descId: 'sec-recos-desc',   dividerId: 'sec-recos-divider',   hasDivider: true  },
+    { key: 'sec_recetas', label: 'Recetas',           tituloId: 'sec-recetas-titulo', descId: 'sec-recetas-desc', dividerId: 'sec-recetas-divider', hasDivider: true  },
+    { key: 'sec_foro',    label: 'Cartas de Lectoras',tituloId: 'sec-foro-titulo',    descId: 'sec-foro-desc',    dividerId: null,                   hasDivider: false },
+    { key: 'sec_sobre',   label: 'Sobre la Diva',     tituloId: 'sec-sobre-titulo',   descId: null,               dividerId: 'sec-sobre-divider',   hasDivider: true  },
+  ];
+
+  function aplicarSecAlignFromConfig(sec) {
+    const textoAlign = CONFIG[sec.key + '_texto'] || 'center';
+    if (sec.tituloId) {
+      const el = document.getElementById(sec.tituloId);
+      if (el) {
+        const p = el.closest('.recetas-header, .forum-header, .container, .sobre-section .container') || el.parentElement;
+        // Apply to header wrapper or parent
+        [el.parentElement].filter(Boolean).forEach(parent => {
+          parent.classList.remove('sec-align-left','sec-align-center','sec-align-right');
+          parent.classList.add('sec-align-' + textoAlign);
+        });
+        el.style.textAlign = textoAlign;
+      }
+    }
+    if (sec.descId) {
+      const el = document.getElementById(sec.descId);
+      if (el) el.style.textAlign = textoAlign;
+    }
+    const divPos = CONFIG[sec.key + '_divider_pos'] || 'after-desc';
+    if (sec.hasDivider && sec.dividerId) { reorderSectionElements(sec, divPos); }
+  }
+
+  function reorderSectionElements(sec, pos) {
+    if (!sec.dividerId) return;
+    const dividerEl = document.getElementById(sec.dividerId);
+    const tituloEl  = sec.tituloId ? document.getElementById(sec.tituloId) : null;
+    const descEl    = sec.descId   ? document.getElementById(sec.descId)   : null;
+    if (!dividerEl) return;
+    const parent = dividerEl.parentElement;
+    if (!parent) return;
+    if (pos === 'before-title' && tituloEl) {
+      parent.insertBefore(dividerEl, tituloEl);
+    } else if (pos === 'after-title' && tituloEl) {
+      tituloEl.insertAdjacentElement('afterend', dividerEl);
+    } else {
+      const ref = descEl || tituloEl;
+      if (ref) ref.insertAdjacentElement('afterend', dividerEl);
+    }
+  }
+
   function aplicarConfig() {
     // textos
     if (CONFIG.nombre_columna)  document.getElementById('header-nombre').innerHTML = CONFIG.nombre_columna.replace('Diva','<em>Diva</em>');
@@ -695,11 +784,12 @@
 
     // banner foto
     const header = document.querySelector('.header');
+    const headerBgImg = document.getElementById('header-bg-img');
     if (CONFIG.banner_foto && CONFIG.banner_foto.trim()) {
-      header.style.backgroundImage = `url('${CONFIG.banner_foto.trim()}')`;
+      headerBgImg.src = CONFIG.banner_foto.trim();
       header.classList.add('has-photo');
     } else {
-      header.style.backgroundImage = '';
+      headerBgImg.src = '';
       header.classList.remove('has-photo');
     }
 
@@ -744,6 +834,9 @@
     const bGrosor = CONFIG.sobre_borde_grosor || '0px';
     document.documentElement.style.setProperty('--sobre-borde-color',  bColor  || 'transparent');
     document.documentElement.style.setProperty('--sobre-borde-grosor', bGrosor);
+
+    // alineaciones de secciones
+    SEC_ALIGN_DEFS.forEach(aplicarSecAlignFromConfig);
   }
 
   async function setConfig(clave, valor) {
@@ -775,20 +868,29 @@
       }
 
       const ps = (c.contenido || '').split(/\n\s*\n/).filter(p => p.trim());
+
+      // Construir HTML de párrafos con cita insertada en la posición correcta
+      const citaHTML = c.cita ? `<div class="pull-quote"><blockquote>«${c.cita}»</blockquote>${c.cita_autor ? `<cite>${c.cita_autor}</cite>` : ''}</div>` : '';
+      const pos = c.cita_posicion || 'final';
+      let parrafosHTML = ps.map((p, i) => `<p${i === 0 ? ' class="drop-cap"' : ''}>${p.trim()}</p>`);
+      
+      if (c.cita && pos !== 'final') {
+        if (pos === 'inicio') {
+          parrafosHTML.unshift(citaHTML);
+        } else if (pos.startsWith('parrafo:')) {
+          const idx = parseInt(pos.split(':')[1]) || 1;
+          parrafosHTML.splice(Math.min(idx, parrafosHTML.length), 0, citaHTML);
+        }
+      }
+
       el.innerHTML = `
         <div class="article-kicker">${c.kicker || 'La Columna de la Semana'}</div>
         <h2>${c.titulo || ''}</h2>
         <div class="article-byline">${c.byline || ''} &nbsp;·&nbsp; <em>Columna semanal</em></div>
-        ${ps.map((p, i) => `<p${i === 0 ? ' class="drop-cap"' : ''}>${p.trim()}</p>`).join('')}`;
+        ${parrafosHTML.join('')}`;
 
-      // pull quote
-      if (c.cita) {
-        document.getElementById('pull-quote-wrap').innerHTML = `
-          <div class="pull-quote">
-            <blockquote>«${c.cita}»</blockquote>
-            ${c.cita_autor ? `<cite>${c.cita_autor}</cite>` : ''}
-          </div>`;
-      }
+      // pull quote al final si la posición es final o no está insertado arriba
+      document.getElementById('pull-quote-wrap').innerHTML = (c.cita && pos === 'final') ? citaHTML : '';
     } catch(e) {
       document.getElementById('article-container').innerHTML = '<p style="font-family:var(--body);color:var(--ink-light);">Error cargando la columna.</p>';
     }
@@ -819,12 +921,19 @@
       const c = d[0];
       document.getElementById('cover-photo-wrap').innerHTML = c.foto_url ? `<img src="${c.foto_url}" class="cover-photo" alt="Portada" onerror="this.style.display='none'">` : '';
       const ps = (c.contenido || '').split(/\n\s*\n/).filter(p => p.trim());
+      const citaHTML = c.cita ? `<div class="pull-quote"><blockquote>«${c.cita}»</blockquote>${c.cita_autor?`<cite>${c.cita_autor}</cite>`:''}</div>` : '';
+      const pos = c.cita_posicion || 'final';
+      let parrafosHTML = ps.map((p, i) => `<p${i === 0 ? ' class="drop-cap"' : ''}>${p.trim()}</p>`);
+      if (c.cita && pos !== 'final') {
+        if (pos === 'inicio') { parrafosHTML.unshift(citaHTML); }
+        else if (pos.startsWith('parrafo:')) { const idx = parseInt(pos.split(':')[1])||1; parrafosHTML.splice(Math.min(idx, parrafosHTML.length), 0, citaHTML); }
+      }
       document.getElementById('article-container').innerHTML = `
         <div class="article-kicker">${c.kicker || 'Archivo'}</div>
         <h2>${c.titulo || ''}</h2>
         <div class="article-byline">${c.byline || ''} &nbsp;·&nbsp; <em>Columna semanal</em></div>
-        ${ps.map((p, i) => `<p${i === 0 ? ' class="drop-cap"' : ''}>${p.trim()}</p>`).join('')}`;
-      document.getElementById('pull-quote-wrap').innerHTML = c.cita ? `<div class="pull-quote"><blockquote>«${c.cita}»</blockquote>${c.cita_autor?`<cite>${c.cita_autor}</cite>`:''}</div>` : '';
+        ${parrafosHTML.join('')}`;
+      document.getElementById('pull-quote-wrap').innerHTML = (c.cita && pos === 'final') ? citaHTML : '';
       document.getElementById('columna').scrollIntoView({ behavior: 'smooth' });
     } catch(e) {}
   }
@@ -1014,6 +1123,11 @@
           <h4>✦ Ingredientes</h4>
           <ul>${ingredientes.map(i => `<li>${i.trim()}</li>`).join('')}</ul>
         </div>` : ''}
+      ${rec.toque_diva ? `
+        <div class="receta-toque-diva">
+          <h4>✦ Toque de la Diva</h4>
+          <p>${rec.toque_diva}</p>
+        </div>` : ''}
       ${pasos.length ? `
         <div class="receta-seccion">
           <h4>✦ Preparación</h4>
@@ -1163,7 +1277,78 @@
   document.getElementById('admin-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') loginAdmin(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { cerrarRecetaModal({ target: document.getElementById('receta-modal') }); } });
 
-  // ── Admin: Columna ──
+  // ── Admin: Diseño — Alineaciones ──
+  function renderSecAlignControls() {
+    const wrap = document.getElementById('sec-align-controls');
+    wrap.innerHTML = SEC_ALIGN_DEFS.map(sec => `
+      <div style="border-bottom:1px dotted var(--divider);padding-bottom:1rem;margin-bottom:1rem;">
+        <div style="font-family:var(--fell);font-size:0.75rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--wine);margin-bottom:0.6rem;">${sec.label}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+          <div>
+            <label class="a-label" style="margin-top:0;">Texto (título + descripción)</label>
+            <div style="display:flex;gap:0.4rem;margin-top:0.3rem;">
+              ${['left','center','right'].map(a => `<button onclick="aplicarAlineacion('${sec.key}_texto','${a}',this)" class="a-btn-sm sec-align-btn" data-key="${sec.key}_texto" data-val="${a}" style="flex:1;">${a==='left'?'◀':a==='center'?'▬':'▶'}</button>`).join('')}
+            </div>
+          </div>
+          ${sec.hasDivider ? `<div>
+            <label class="a-label" style="margin-top:0;">Separador ✦</label>
+            <select class="a-input" id="sel-div-pos-${sec.key}" style="font-size:0.82rem;padding:0.35rem;" onchange="aplicarDividerPos('${sec.key}',this.value)">
+              <option value="after-desc">Bajo la descripción</option>
+              <option value="after-title">Bajo el título</option>
+              <option value="before-title">Sobre el título</option>
+            </select>
+          </div>` : '<div></div>'}
+        </div>
+      </div>`).join('');
+    // Marcar botones activos según CONFIG
+    SEC_ALIGN_DEFS.forEach(sec => {
+      const textoAlign = CONFIG[sec.key + '_texto'] || 'center';
+      document.querySelectorAll(`.sec-align-btn[data-key="${sec.key}_texto"]`).forEach(btn => {
+        btn.style.background = btn.dataset.val === textoAlign ? 'var(--wine)' : '';
+        btn.style.color = btn.dataset.val === textoAlign ? 'var(--cream)' : '';
+      });
+      if (sec.hasDivider) {
+        const selEl = document.getElementById(`sel-div-pos-${sec.key}`);
+        if (selEl) selEl.value = CONFIG[sec.key + '_divider_pos'] || 'after-desc';
+      }
+    });
+    // Aplicar los valores actuales al DOM
+    SEC_ALIGN_DEFS.forEach(aplicarSecAlignFromConfig);
+  }
+
+  function aplicarAlineacion(key, align, btn) {
+    // Actualizar botones
+    document.querySelectorAll(`.sec-align-btn[data-key="${key}"]`).forEach(b => {
+      b.style.background = b.dataset.val === align ? 'var(--wine)' : '';
+      b.style.color = b.dataset.val === align ? 'var(--cream)' : '';
+    });
+    CONFIG[key] = align;
+    const secKey = key.replace('_texto','');
+    const sec = SEC_ALIGN_DEFS.find(s => s.key === secKey);
+    if (sec) aplicarSecAlignFromConfig(sec);
+  }
+
+  function aplicarDividerPos(secKey, pos) {
+    CONFIG[secKey + '_divider_pos'] = pos;
+    const sec = SEC_ALIGN_DEFS.find(s => s.key === secKey);
+    if (sec) reorderSectionElements(sec, pos);
+  }
+
+  async function guardarAlineaciones() {
+    try {
+      for (const sec of SEC_ALIGN_DEFS) {
+        const textoAlign = CONFIG[sec.key + '_texto'] || 'center';
+        await setConfig(sec.key + '_texto', textoAlign);
+        if (sec.hasDivider) {
+          const divPos = CONFIG[sec.key + '_divider_pos'] || 'after-desc';
+          await setConfig(sec.key + '_divider_pos', divPos);
+        }
+      }
+      setMsg('msg-alineaciones', '✦ Alineaciones guardadas.');
+    } catch(e) { setMsg('msg-alineaciones', 'Error al guardar alineaciones.'); }
+  }
+
+  // ── Admin: Diseño — Colores y Fuentes ──
   async function publicarColumna() {
     const titulo    = document.getElementById('a-titulo').value.trim();
     const kicker    = document.getElementById('a-kicker').value.trim();
@@ -1172,18 +1357,21 @@
     const foto_url  = document.getElementById('a-foto').value.trim() || null;
     const cita      = document.getElementById('a-cita').value.trim() || null;
     const cita_autor= document.getElementById('a-cita-autor').value.trim() || null;
+    const citaPosParrafo = document.getElementById('a-cita-pos-parrafo').value.trim();
+    const citaPosRadio   = document.querySelector('input[name="cita-pos"]:checked')?.value || 'final';
+    const cita_posicion  = citaPosParrafo ? `parrafo:${citaPosParrafo}` : citaPosRadio;
     if (!titulo || !contenido) { setMsg('msg-col', 'El título y el contenido son obligatorios.'); return; }
     const btn = document.getElementById('btn-publicar');
     btn.textContent = 'Publicando...'; btn.disabled = true;
     try {
       const r = await fetch(`${SB}/rest/v1/columnas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, kicker, byline, contenido, activa: true, foto_url, cita, cita_autor })
+        body: JSON.stringify({ titulo, kicker, byline, contenido, activa: true, foto_url, cita, cita_autor, cita_posicion })
       });
       const txt = await r.text();
       if (!r.ok) { console.error(txt); throw new Error(txt); }
-      ['a-titulo','a-kicker','a-byline','a-contenido','a-foto','a-cita','a-cita-autor'].forEach(id => document.getElementById(id).value = '');
-      setMsg('msg-col', '✦ Columna publicada con éxito.');
+      ['a-titulo','a-kicker','a-byline','a-contenido','a-foto','a-cita','a-cita-autor','a-cita-pos-parrafo'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cita-pos-final').checked = true;      setMsg('msg-col', '✦ Columna publicada con éxito.');
       await Promise.all([cargarColumna(), cargarArchivo(), cargarListaColumnas()]);
     } catch(e) { console.error(e); setMsg('msg-col', 'Error al publicar. Abre la consola (F12) para ver los detalles.'); }
     finally { btn.textContent = 'Publicar columna ✦'; btn.disabled = false; }
@@ -1315,6 +1503,7 @@
     if (selT) { [...selT.options].forEach(o => { if (o.value === ft) o.selected = true; }); }
     if (selC) { [...selC.options].forEach(o => { if (o.value === fc) o.selected = true; }); }
     previewFuente();
+    renderSecAlignControls();
   }
 
   function syncColorText(key) {
@@ -1416,16 +1605,17 @@
     const titulo       = document.getElementById('rec-titulo').value.trim();
     const descripcion  = document.getElementById('rec-desc').value.trim();
     const ingredientes = document.getElementById('rec-ingredientes').value.trim();
+    const toque_diva   = document.getElementById('rec-toque-diva').value.trim() || null;
     const pasos        = document.getElementById('rec-pasos').value.trim();
     const foto_url     = document.getElementById('rec-foto').value.trim() || null;
     if (!titulo) { setMsg('msg-receta', 'El título es obligatorio.'); return; }
     try {
       const r = await fetch(`${SB}/rest/v1/recetas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, descripcion, ingredientes, pasos, foto_url, activa: true })
+        body: JSON.stringify({ titulo, descripcion, ingredientes, toque_diva, pasos, foto_url, activa: true })
       });
       if (!r.ok) throw new Error(await r.text());
-      ['rec-titulo','rec-desc','rec-ingredientes','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
+      ['rec-titulo','rec-desc','rec-ingredientes','rec-toque-diva','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
       setMsg('msg-receta', '✦ Receta publicada.');
       await Promise.all([cargarListaRecetas(), cargarRecetas()]);
     } catch(e) { setMsg('msg-receta', 'Error al publicar receta.'); }
