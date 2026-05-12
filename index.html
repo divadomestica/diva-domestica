@@ -876,8 +876,9 @@ body.loading::before {
   } finally {
     // Quitar la clase loading cuando termine (éxito o error)
     document.body.classList.remove('loading');
+    console.log('🔵 Clase loading removida');
   }
-  
+}
 
   // ── Alineaciones de sección (definidas antes de aplicarConfig) ──
   const SEC_ALIGN_DEFS = [
