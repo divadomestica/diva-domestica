@@ -198,7 +198,13 @@
   .reco-card { border-left: 3px solid var(--gold); padding: 0.75rem 1rem; background: var(--gold-pale); }
   .reco-semana { font-family: var(--body); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--wine); margin-bottom: 0.25rem; }
   .reco-titulo { font-family: var(--serif); font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
-  .reco-desc { font-family: var(--body); font-size: 0.85rem; color: var(--ink-light); line-height: 1.5; }
+  .reco-desc {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  line-height: 1.5;
+  text-align: justify;
+}
   .reco-url { display: inline-block; margin-top: 0.5rem; font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.12em; color: var(--wine); text-decoration: none; text-transform: uppercase; border-bottom: 1px solid var(--wine); }
 
   /* Alineación dinámica de cabeceras de sección */
@@ -402,8 +408,8 @@
   </div>
 
   <!-- RECOMENDACIONES (oculta hasta que haya contenido) -->
-  <div class="container" id="recomendaciones" style="margin-bottom:0;padding-bottom:3rem;min-height:calc(100vh - 200px);display:none;">
-    <div class="ornament-divider" id="sec-recos-divider"><span class="icon">✦ ✦ ✦</span></div>
+<div class="container" id="recomendaciones" style="margin-bottom:0;padding-top:2rem;padding-bottom:3rem;min-height:calc(100vh - 200px);display:none;scroll-margin-top:80px;">
+<div class="ornament-divider" id="sec-recos-divider" style="margin:1.5rem 0;"><span class="icon">✦ ✦ ✦</span></div>
     <h2 id="sec-recos-titulo" style="font-family:var(--serif);font-size:2rem;font-weight:700;font-style:italic;margin-bottom:0.3rem;text-align:center;">Recomendaciones Semanales</h2>
     <p id="sec-recos-desc" style="font-family:var(--fell);font-style:italic;font-size:0.9rem;color:var(--ink-light);margin-bottom:0;text-align:center;">Lo que la diva ha leído, probado y aprobado esta semana.</p>
     <div class="reco-grid" id="recos-grid"></div>
@@ -534,6 +540,12 @@
         </div>
 
         <div class="admin-box">
+<div class="admin-title">✦ Preselección de paleta</div>
+<div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+  <button class="a-btn-sm" onclick="aplicarPaleta('primaria')" style="background: #8A6674; color: white; border: none;">Paleta actual (vino)</button>
+  <button class="a-btn-sm" onclick="aplicarPaleta('secundaria')" style="background: #ABC0F6; color: #2E2428; border: none;">Paleta serena (azules)</button>
+</div>
+<div class="a-msg" id="msg-paleta"></div>
           <div class="admin-title">✦ Paleta de colores</div>
           <div id="color-pickers">
             <!-- se genera dinámicamente -->
@@ -700,6 +712,81 @@
   const PH   = { ...GH, 'Content-Type': 'application/json' };
   const COLS = ['#8A6674','#7A6B8A','#6B5A5E','#AB9CD1','#A49A98','#9B8A8E'];
   const TAGS = { misterio:'Misterio', receta:'Receta', consejo:'Consejo', confesion:'Confesión' };
+  
+// ── PALETAS PREDEFINIDAS ──
+
+  const PALETA_PRIMARIA = {
+    color_wine: '#8A6674',
+    color_wine_light: '#A49A98',
+    color_wine_pale: '#F0EAED',
+    color_gold: '#AB9CD1',
+    color_gold_light: '#A7A1B8',
+    color_gold_pale: '#EEEAF5',
+    color_ink: '#2E2428',
+    color_ink_light: '#6B5A5E',
+    color_cream: '#FAF8F7',
+    color_cream_dark: '#EDE6E8',
+    color_divider: '#CCC5C5'
+  };
+
+  const PALETA_SECUNDARIA = {
+    color_wine: '#7B9CBF',
+    color_wine_light: '#9BB0C4',
+    color_wine_pale: '#E8F0F5',
+    color_gold: '#C5D5EA',
+    color_gold_light: '#D0DEE8',
+    color_gold_pale: '#F0F4F8',
+    color_ink: '#1E2A3A',
+    color_ink_light: '#4A5B6E',
+    color_cream: '#FAF8F7',
+    color_cream_dark: '#E8EEF5',
+    color_divider: '#C8D4E0'
+  };
+
+  async function aplicarPaleta(tipo) {
+    const paleta = tipo === 'secundaria' ? PALETA_SECUNDARIA : PALETA_PRIMARIA;
+    try {
+      for (const [clave, valor] of Object.entries(paleta)) {
+        await setConfig(clave, valor);
+        const colorInput = document.getElementById(`ct-${clave}`);
+        if (colorInput) colorInput.value = valor;
+        const colorPicker = document.getElementById(`cp-${clave}`);
+        if (colorPicker) colorPicker.value = valor;
+        const cssVar = {
+          color_wine: '--wine',
+          color_wine_light: '--wine-light',
+          color_wine_pale: '--wine-pale',
+          color_gold: '--gold',
+          color_gold_light: '--gold-light',
+          color_gold_pale: '--gold-pale',
+          color_ink: '--ink',
+          color_ink_light: '--ink-light',
+          color_cream: '--cream',
+          color_cream_dark: '--cream-dark',
+          color_divider: '--divider'
+        }[clave];
+        if (cssVar) document.documentElement.style.setProperty(cssVar, valor);
+      }
+      setMsg('msg-paleta', `✦ Paleta ${tipo === 'secundaria' ? 'serena (azules)' : 'actual (vino)'} aplicada. Guarda los cambios para conservarla.`);
+      const defs = [
+        { key: 'color_wine' }, { key: 'color_wine_light' }, { key: 'color_wine_pale' },
+        { key: 'color_gold' }, { key: 'color_gold_light' }, { key: 'color_gold_pale' },
+        { key: 'color_ink' }, { key: 'color_ink_light' },
+        { key: 'color_cream' }, { key: 'color_cream_dark' }, { key: 'color_divider' }
+      ];
+      defs.forEach(def => {
+        const val = paleta[def.key];
+        if (val) {
+          const txtInput = document.getElementById(`ct-${def.key}`);
+          if (txtInput) txtInput.value = val;
+          const picker = document.getElementById(`cp-${def.key}`);
+          if (picker) picker.value = val;
+        }
+      });
+    } catch(e) {
+      setMsg('msg-paleta', 'Error al aplicar la paleta.');
+    }
+  }
 
   // ── NOTIF ──
   function notif(m) {
@@ -795,12 +882,19 @@
     }
 
     // colores
-    const colorMap = {
-      color_wine: '--wine', color_gold: '--gold', color_ink: '--ink', color_cream: '--cream'
-    };
-    Object.entries(colorMap).forEach(([key, cssVar]) => {
-      if (CONFIG[key]) document.documentElement.style.setProperty(cssVar, CONFIG[key]);
-    });
+        const colorMap = {
+          color_wine: '--wine',
+          color_wine_light: '--wine-light',
+          color_wine_pale: '--wine-pale',
+          color_gold: '--gold',
+          color_gold_light: '--gold-light',
+          color_gold_pale: '--gold-pale',
+          color_ink: '--ink',
+          color_ink_light: '--ink-light',
+          color_cream: '--cream',
+          color_cream_dark: '--cream-dark',
+          color_divider: '--divider'
+        };
 
     // fuentes — cargar Google Fonts si cambiaron
     const fTitulo = CONFIG.fuente_titulo || 'Playfair Display';
@@ -1110,32 +1204,34 @@
   }
 
   function abrirReceta(id) {
-    const rec = _recetasData.find(r => r.id === id);
-    if (!rec) return;
-    const ingredientes = (rec.ingredientes || '').split('\n').filter(l => l.trim());
-    const pasos = (rec.pasos || '').split('\n').filter(l => l.trim());
-    document.getElementById('receta-modal-contenido').innerHTML = `
-      ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
-      <div class="receta-modal-kicker">Receta de la Diva</div>
-      <div class="receta-modal-titulo">${rec.titulo}</div>
-      ${rec.descripcion ? `<div class="receta-modal-desc">${rec.descripcion}</div>` : ''}
-      ${ingredientes.length ? `
-        <div class="receta-seccion">
-          <h4>✦ Ingredientes</h4>
-          <ul>${ingredientes.map(i => `<li>${i.trim()}</li>`).join('')}</ul>
-        </div>` : ''}
-      ${pasos.length ? `
-        <div class="receta-seccion">
-          <h4>✦ Preparación</h4>
-          ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
-        </div>` : ''}
-      ${rec.toque_diva ? `
-        <div class="receta-toque-diva">
-          <h4>✦ Toque de la Diva</h4>
-          <p>${rec.toque_diva}</p>
-        </div>` : ''}`;
-    document.body.style.overflow = 'hidden';
-  }
+  const rec = _recetasData.find(r => r.id === id);
+  if (!rec) return;
+  const ingredientes = (rec.ingredientes || '').split('\n').filter(l => l.trim());
+  const pasos = (rec.pasos || '').split('\n').filter(l => l.trim());
+  document.getElementById('receta-modal-contenido').innerHTML = `
+    ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
+    <div class="receta-modal-kicker">Receta de la Diva</div>
+    <div class="receta-modal-titulo">${rec.titulo}</div>
+    ${rec.descripcion ? `<div class="receta-modal-desc">${rec.descripcion}</div>` : ''}
+    ${ingredientes.length ? `
+      <div class="receta-seccion">
+        <h4>✦ Ingredientes</h4>
+        <ul>${ingredientes.map(i => `<li>${i.trim()}</li>`).join('')}</ul>
+      </div>` : ''}
+    ${pasos.length ? `
+      <div class="receta-seccion">
+        <h4>✦ Preparación</h4>
+        ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
+      </div>` : ''}
+    ${rec.toque_diva ? `
+      <div class="receta-toque-diva">
+        <h4>✦ Toque de la Diva</h4>
+        <p>${rec.toque_diva}</p>
+      </div>` : ''}`;
+  // 👇 ESTA ES LA LÍNEA QUE FALTA
+  document.getElementById('receta-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
 
   function cerrarRecetaModal(e) {
     if (e && e.target !== document.getElementById('receta-modal') && !e.target.classList.contains('receta-modal-close')) return;
@@ -1478,10 +1574,17 @@
 
   // ── Admin: Diseño ──
   const COLOR_DEFS = [
-    { key: 'color_wine',  label: 'Color principal (vino)', cssVar: '--wine' },
-    { key: 'color_gold',  label: 'Color acento (dorado)',  cssVar: '--gold' },
-    { key: 'color_ink',   label: 'Color tinta (oscuro)',   cssVar: '--ink'  },
-    { key: 'color_cream', label: 'Color fondo (crema)',    cssVar: '--cream'},
+    { key: 'color_wine',       label: 'Principal (botones, bordes)',      cssVar: '--wine' },
+    { key: 'color_wine_light', label: 'Principal claro',                  cssVar: '--wine-light' },
+    { key: 'color_wine_pale',  label: 'Principal pálido (fondos)',        cssVar: '--wine-pale' },
+    { key: 'color_gold',       label: 'Acento (citas, destacados)',       cssVar: '--gold' },
+    { key: 'color_gold_light', label: 'Acento claro',                     cssVar: '--gold-light' },
+    { key: 'color_gold_pale',  label: 'Acento pálido (fondos)',           cssVar: '--gold-pale' },
+    { key: 'color_ink',        label: 'Texto principal',                  cssVar: '--ink' },
+    { key: 'color_ink_light',  label: 'Texto secundario',                 cssVar: '--ink-light' },
+    { key: 'color_cream',      label: 'Fondo general',                    cssVar: '--cream' },
+    { key: 'color_cream_dark', label: 'Fondo secciones alternas',         cssVar: '--cream-dark' },
+    { key: 'color_divider',    label: 'Separadores',                      cssVar: '--divider' }
   ];
 
   function cargarFormDiseno() {
