@@ -270,6 +270,20 @@
   .respuesta-form { background: var(--cream-dark); border: 1px solid var(--divider); padding: 0.75rem; margin-top: 0.5rem; }
   .respuesta-form textarea { width: 100%; border: 1px solid var(--divider); background: var(--cream); font-family: var(--body); font-size: 0.88rem; color: var(--ink); padding: 0.5rem 0.7rem; resize: vertical; }
   .respuesta-form textarea:focus { outline: none; border-color: var(--wine); }
+
+/* ===== FOTO BANNER: ocultar texto y fondo oscuro ===== */
+.header.has-photo {
+  background: none !important;
+}
+.header.has-photo::after {
+  display: none !important;
+}
+.header.has-photo .header-ornament,
+.header.has-photo h1,
+.header.has-photo .header-sub,
+.header.has-photo .header-rule {
+  visibility: hidden !important;
+}
 </style>
 </head>
 <body>
@@ -805,14 +819,15 @@
   let CONFIG = {};
 
   async function cargarConfig() {
-    try {
-      const r = await fetch(`${SB}/rest/v1/config?select=clave,valor`, { headers: GH });
-      const d = await r.json();
-      if (!Array.isArray(d)) return;
-      d.forEach(row => { CONFIG[row.clave] = row.valor; });
-      aplicarConfig();
-    } catch(e) { console.error('Config error', e); }
-  }
+  try {
+    const r = await fetch(`${SB}/rest/v1/config?select=clave,valor`, { headers: GH });
+    const d = await r.json();
+    if (!Array.isArray(d)) return;
+    d.forEach(row => { CONFIG[row.clave] = row.valor; });
+    console.log('🎨 CONFIG cargada desde Supabase:', CONFIG);
+    aplicarConfig();
+  } catch(e) { console.error('Config error', e); }
+}
 
   // ── Alineaciones de sección (definidas antes de aplicarConfig) ──
   const SEC_ALIGN_DEFS = [
@@ -862,77 +877,84 @@
     }
   }
 
-  function aplicarConfig() {
-    // textos
-    if (CONFIG.nombre_columna)  document.getElementById('header-nombre').innerHTML = CONFIG.nombre_columna.replace('Diva','<em>Diva</em>');
-    if (CONFIG.subtitulo)       document.getElementById('header-subtitulo').textContent = CONFIG.subtitulo;
-    if (CONFIG.pie_pagina)      document.getElementById('footer-texto').textContent = CONFIG.pie_pagina;
-    if (CONFIG.consejo_semana)  document.getElementById('consejo-semana').textContent = CONFIG.consejo_semana;
-    if (CONFIG.proxima_edicion) document.getElementById('proxima-edicion').textContent = CONFIG.proxima_edicion;
+function aplicarConfig() {
+  // textos
+  if (CONFIG.nombre_columna)  document.getElementById('header-nombre').innerHTML = CONFIG.nombre_columna.replace('Diva','<em>Diva</em>');
+  if (CONFIG.subtitulo)       document.getElementById('header-subtitulo').textContent = CONFIG.subtitulo;
+  if (CONFIG.pie_pagina)      document.getElementById('footer-texto').textContent = CONFIG.pie_pagina;
+  if (CONFIG.consejo_semana)  document.getElementById('consejo-semana').textContent = CONFIG.consejo_semana;
+  if (CONFIG.proxima_edicion) document.getElementById('proxima-edicion').textContent = CONFIG.proxima_edicion;
 
-    // banner foto
-    const header = document.querySelector('.header');
-    const headerBgImg = document.getElementById('header-bg-img');
-    if (CONFIG.banner_foto && CONFIG.banner_foto.trim()) {
-      headerBgImg.src = CONFIG.banner_foto.trim();
-      header.classList.add('has-photo');
-    } else {
-      headerBgImg.src = '';
-      header.classList.remove('has-photo');
-    }
-
-    // colores
-        const colorMap = {
-          color_wine: '--wine',
-          color_wine_light: '--wine-light',
-          color_wine_pale: '--wine-pale',
-          color_gold: '--gold',
-          color_gold_light: '--gold-light',
-          color_gold_pale: '--gold-pale',
-          color_ink: '--ink',
-          color_ink_light: '--ink-light',
-          color_cream: '--cream',
-          color_cream_dark: '--cream-dark',
-          color_divider: '--divider'
-        };
-
-    // fuentes — cargar Google Fonts si cambiaron
-    const fTitulo = CONFIG.fuente_titulo || 'Playfair Display';
-    const fCuerpo = CONFIG.fuente_cuerpo || 'Cormorant Garamond';
-    const fontsToLoad = [fTitulo, fCuerpo].filter(f => !['Playfair Display','Cormorant Garamond','IM Fell English'].includes(f));
-    if (fontsToLoad.length) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = `https://fonts.googleapis.com/css2?family=${fontsToLoad.map(f => f.replace(/ /g,'+')).join('&family=')}&display=swap`;
-      document.head.appendChild(link);
-    }
-    document.documentElement.style.setProperty('--serif', `'${fTitulo}', Georgia, serif`);
-    document.documentElement.style.setProperty('--body',  `'${fCuerpo}', Georgia, serif`);
-
-    // sobre la diva
-    const bio  = CONFIG.sobre_diva_bio  || '';
-    const foto = CONFIG.sobre_diva_foto || '';
-    if (bio || foto) {
-      const sobreEl = document.getElementById('sobre');
-      if (sobreEl) { sobreEl.style.display = ''; sobreEl.dataset.tieneContenido = '1'; }
-      document.getElementById('nav-sobre').style.display = '';
-      document.getElementById('sobre-bio').textContent = bio;
-      if (foto) {
-        document.getElementById('sobre-inner').innerHTML = `
-          <img src="${foto}" class="sobre-foto" id="sobre-foto-img" alt="La Diva" onerror="this.style.display='none'">
-          <p class="sobre-bio" id="sobre-bio">${bio}</p>`;
-      }
-    }
-
-    // borde foto diva
-    const bColor  = CONFIG.sobre_borde_color  || '';
-    const bGrosor = CONFIG.sobre_borde_grosor || '0px';
-    document.documentElement.style.setProperty('--sobre-borde-color',  bColor  || 'transparent');
-    document.documentElement.style.setProperty('--sobre-borde-grosor', bGrosor);
-
-    // alineaciones de secciones
-    SEC_ALIGN_DEFS.forEach(aplicarSecAlignFromConfig);
+  // banner foto
+  const header = document.querySelector('.header');
+  const headerBgImg = document.getElementById('header-bg-img');
+  if (CONFIG.banner_foto && CONFIG.banner_foto.trim()) {
+    headerBgImg.src = CONFIG.banner_foto.trim();
+    header.classList.add('has-photo');
+  } else {
+    headerBgImg.src = '';
+    header.classList.remove('has-photo');
   }
+
+  // 👇 APLICAR COLORES (esto es lo que faltaba)
+  const colorMap = {
+    color_wine: '--wine',
+    color_wine_light: '--wine-light',
+    color_wine_pale: '--wine-pale',
+    color_gold: '--gold',
+    color_gold_light: '--gold-light',
+    color_gold_pale: '--gold-pale',
+    color_ink: '--ink',
+    color_ink_light: '--ink-light',
+    color_cream: '--cream',
+    color_cream_dark: '--cream-dark',
+    color_divider: '--divider'
+  };
+  // Recorrer el mapeo y aplicar los valores de CONFIG
+  Object.entries(colorMap).forEach(([key, cssVar]) => {
+    if (CONFIG[key]) {
+      document.documentElement.style.setProperty(cssVar, CONFIG[key]);
+      console.log(`✅ Aplicado ${cssVar} = ${CONFIG[key]}`); // para depurar
+    }
+  });
+
+  // fuentes — cargar Google Fonts si cambiaron
+  const fTitulo = CONFIG.fuente_titulo || 'Playfair Display';
+  const fCuerpo = CONFIG.fuente_cuerpo || 'Cormorant Garamond';
+  const fontsToLoad = [fTitulo, fCuerpo].filter(f => !['Playfair Display','Cormorant Garamond','IM Fell English'].includes(f));
+  if (fontsToLoad.length) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${fontsToLoad.map(f => f.replace(/ /g,'+')).join('&family=')}&display=swap`;
+    document.head.appendChild(link);
+  }
+  document.documentElement.style.setProperty('--serif', `'${fTitulo}', Georgia, serif`);
+  document.documentElement.style.setProperty('--body',  `'${fCuerpo}', Georgia, serif`);
+
+  // sobre la diva
+  const bio  = CONFIG.sobre_diva_bio  || '';
+  const foto = CONFIG.sobre_diva_foto || '';
+  if (bio || foto) {
+    const sobreEl = document.getElementById('sobre');
+    if (sobreEl) { sobreEl.style.display = ''; sobreEl.dataset.tieneContenido = '1'; }
+    document.getElementById('nav-sobre').style.display = '';
+    document.getElementById('sobre-bio').textContent = bio;
+    if (foto) {
+      document.getElementById('sobre-inner').innerHTML = `
+        <img src="${foto}" class="sobre-foto" id="sobre-foto-img" alt="La Diva" onerror="this.style.display='none'">
+        <p class="sobre-bio" id="sobre-bio">${bio}</p>`;
+    }
+  }
+
+  // borde foto diva
+  const bColor  = CONFIG.sobre_borde_color  || '';
+  const bGrosor = CONFIG.sobre_borde_grosor || '0px';
+  document.documentElement.style.setProperty('--sobre-borde-color',  bColor  || 'transparent');
+  document.documentElement.style.setProperty('--sobre-borde-grosor', bGrosor);
+
+  // alineaciones de secciones
+  SEC_ALIGN_DEFS.forEach(aplicarSecAlignFromConfig);
+}
 
   async function setConfig(clave, valor) {
     return fetch(`${SB}/rest/v1/config?clave=eq.${encodeURIComponent(clave)}`, {
