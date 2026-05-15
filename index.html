@@ -1297,29 +1297,77 @@ function aplicarConfig() {
   function abrirReceta(id) {
   const rec = _recetasData.find(r => r.id === id);
   if (!rec) return;
-  const ingredientes = (rec.ingredientes || '').split('\n').filter(l => l.trim());
+  
+  // --- PROCESAR INGREDIENTES CON SECCIONES ---
+  const ingredientesRaw = rec.ingredientes || '';
+  const lines = ingredientesRaw.split(/\r?\n/);
+  
+  let ingredientesHTML = '';
+  let currentSection = null;
+  let sectionItems = [];
+  
+  // Función para cerrar la sección actual y generar el HTML
+  function closeSection() {
+    if (currentSection !== null && sectionItems.length > 0) {
+      const tituloHTML = currentSection ? `<h4>✦ ${currentSection}</h4>` : '';
+      ingredientesHTML += `<div class="receta-seccion">${tituloHTML}<ul>${sectionItems.map(i => `<li>${i.trim()}</li>`).join('')}</ul></div>`;
+      sectionItems = [];
+    }
+  }
+  
+  for (let line of lines) {
+    line = line.trim();
+    if (line === '') continue;
+    
+    // Detectar título de sección: **Texto:** o **Texto**
+    const titleMatch = line.match(/^\*\*(.*?)\*\*:?\s*$/);
+    if (titleMatch) {
+      closeSection();
+      currentSection = titleMatch[1].trim();
+      continue;
+    }
+    
+    // Detectar ingrediente (línea que empieza con · - * • o número con punto)
+    const ingredientMatch = line.match(/^[·\-*•]\s*(.*)$/) || line.match(/^\d+\.\s*(.*)$/);
+    if (ingredientMatch) {
+      sectionItems.push(ingredientMatch[1]);
+      if (currentSection === null) currentSection = ''; // sección sin título
+      continue;
+    }
+    
+    // Si no es título ni ingrediente, tratarlo como parte de la lista (para compatibilidad)
+    // Pero mejor lo ignoramos para no mezclar.
+  }
+  closeSection();
+  
+  // Si no se detectó ningún ingrediente formateado, usar el método antiguo (lista simple)
+  if (ingredientesHTML === '' && ingredientesRaw.trim() !== '') {
+    const listaSimple = ingredientesRaw.split('\n').filter(l => l.trim());
+    ingredientesHTML = `<div class="receta-seccion"><ul>${listaSimple.map(i => `<li>${i.trim()}</li>`).join('')}</ul></div>`;
+  }
+  
+  // --- PROCESAR PASOS (sin cambios) ---
   const pasos = (rec.pasos || '').split('\n').filter(l => l.trim());
+  const pasosHTML = pasos.length ? `
+    <div class="receta-seccion">
+      <h4>✦ Preparación</h4>
+      ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
+    </div>` : '';
+  
+  // --- MONTAR EL MODAL ---
   document.getElementById('receta-modal-contenido').innerHTML = `
     ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
     <div class="receta-modal-kicker">Receta de la Diva</div>
     <div class="receta-modal-titulo">${rec.titulo}</div>
     ${rec.descripcion ? `<div class="receta-modal-desc">${rec.descripcion}</div>` : ''}
-    ${ingredientes.length ? `
-      <div class="receta-seccion">
-        <h4>✦ Ingredientes</h4>
-        <ul>${ingredientes.map(i => `<li>${i.trim()}</li>`).join('')}</ul>
-      </div>` : ''}
-    ${pasos.length ? `
-      <div class="receta-seccion">
-        <h4>✦ Preparación</h4>
-        ${pasos.map((p,i) => `<div class="receta-paso"><span class="receta-paso-num">${i+1}.</span><span>${p.trim()}</span></div>`).join('')}
-      </div>` : ''}
+    ${ingredientesHTML}
+    ${pasosHTML}
     ${rec.toque_diva ? `
       <div class="receta-toque-diva">
         <h4>✦ Toque de la Diva</h4>
         <p>${rec.toque_diva}</p>
       </div>` : ''}`;
-  // 👇 ESTA ES LA LÍNEA QUE FALTA
+  
   document.getElementById('receta-modal').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
