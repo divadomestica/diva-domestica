@@ -61,6 +61,13 @@
   .nav-dropdown a { font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink); text-decoration: none; padding: 0.85rem 1.5rem; border-bottom: 1px solid var(--divider); transition: background 0.15s, color 0.15s; }
   .nav-dropdown a:last-child { border-bottom: none; }
   .nav-dropdown a:hover { background: var(--wine-pale); color: var(--wine); padding-left: 1.9rem; }
+  .nav-dropdown a.nav-sub {
+    padding-left: 2.5rem; font-size: 0.68rem;
+    color: var(--ink-light); border-left: 2px solid var(--divider);
+    margin-left: 0.75rem; letter-spacing: 0.18em;
+  }
+  .nav-dropdown a.nav-sub::before { content: "└ "; }
+  .nav-dropdown a.nav-sub:hover { background: var(--gold-pale); color: var(--wine); padding-left: 2.9rem; border-left-color: var(--wine); }
   .nav-dropdown a.active { background: var(--ink); color: var(--gold); }
 
   .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
@@ -909,14 +916,14 @@ body.loading::before {
     <span class="nav-icon">✦</span>
   </button>
   <div class="nav-dropdown" id="nav-dropdown">
-    <a href="#columna" class="active" onclick="cerrarNav()">La columna</a>
-    <a href="#foro" onclick="cerrarNav()">Cartas de lectores</a>
-    <a href="#escribir" onclick="cerrarNav()">Escribe</a>
-    <a href="#archivo" onclick="cerrarNav()">Archivo</a>
-    <a href="#recetas" id="nav-recetas" style="display:none;" onclick="cerrarNav()">Recetas</a>
-    <a href="#recomendaciones" id="nav-recos" style="display:none;" onclick="cerrarNav()">Recomendaciones</a>
-    <a href="#sobre" id="nav-sobre" style="display:none;" onclick="cerrarNav()">Sobre la Diva</a>
-    <a href="#autores" id="nav-autores" style="display:none;" onclick="cerrarNav()">Autores</a>
+    <a href="#columna" class="active" onclick="cerrarNav();gestionarAutoresEnNav(true)">La columna</a>
+    <a href="#foro" onclick="cerrarNav();gestionarAutoresEnNav(true)">Cartas de lectores</a>
+    <a href="#escribir" onclick="cerrarNav();gestionarAutoresEnNav(true)">Escribe</a>
+    <a href="#archivo" onclick="cerrarNav();gestionarAutoresEnNav(true)">Archivo</a>
+    <a href="#recetas" id="nav-recetas" style="display:none;" onclick="cerrarNav();gestionarAutoresEnNav(false)">Recetas</a>
+    <a href="#recomendaciones" id="nav-recos" style="display:none;" onclick="cerrarNav();gestionarAutoresEnNav(false)">Recomendaciones</a>
+    <a href="#sobre" id="nav-sobre" style="display:none;" onclick="cerrarNav();gestionarAutoresEnNav(true)">Sobre la Diva</a>
+    <a href="#autores" id="nav-autores" style="display:none;" onclick="cerrarNav();gestionarAutoresEnNav(true)">Autores</a>
   </div>
 </nav>
 
@@ -1113,16 +1120,7 @@ body.loading::before {
   </section>
   
     <!-- AUTORAS (oculta hasta que haya perfiles) -->
-  <section class="autores-section" id="autores" style="display:none;scroll-margin-top:80px;">
-    <div class="container">
-      <div class="ornament-divider" id="sec-autores-divider"><span class="icon">✦ ✦ ✦</span></div>
-      <div class="autores-header">
-        <h2 id="sec-autores-titulo" style="font-family:var(--serif);font-size:1.8rem;font-style:italic;color:var(--wine);margin-bottom:0.3rem;">Autores</h2>
-        <p id="sec-autores-desc" style="font-family:var(--fell);font-style:italic;font-size:0.9rem;color:var(--ink-light);">Las voces detrás de cada columna ¿Quieres saber más sobre ellos? Ven a conocerles más a fondo.</p>
-      </div>
-      <div class="autores-grid" id="autores-grid"></div>
-    </div>
-  </section>
+
 
   <!-- Modal perfil de autora -->
   <div id="perfil-modal" onclick="cerrarPerfilModal(event)">
@@ -1146,6 +1144,18 @@ body.loading::before {
   </div>
 
 
+
+
+  <section class="autores-section" id="autores" style="display:none;scroll-margin-top:80px;">
+    <div class="container">
+      <div class="ornament-divider" id="sec-autores-divider"><span class="icon">✦ ✦ ✦</span></div>
+      <div class="autores-header">
+        <h2 id="sec-autores-titulo" style="font-family:var(--serif);font-size:1.8rem;font-style:italic;color:var(--wine);margin-bottom:0.3rem;">Autores</h2>
+        <p id="sec-autores-desc" style="font-family:var(--fell);font-style:italic;font-size:0.9rem;color:var(--ink-light);">Las voces detrás de cada columna ¿Quieres saber más sobre ellos? Ven a conocerles más a fondo.</p>
+      </div>
+      <div class="autores-grid" id="autores-grid"></div>
+    </div>
+  </section>
 
 </main>
 
@@ -3656,6 +3666,21 @@ function toggleNav() {
     if (res) res.textContent = opcion === 'diva'
       ? 'Has elegido a la Diva. Buen gusto.'
       : 'Has elegido la original. Qué valiente.';
+  }
+
+
+  // ── Ocultar/mostrar autoras según sección activa ──
+  let _autoresDataCargada = false; // track si cargarAutoras ya puso contenido
+
+  function gestionarAutoresEnNav(mostrar) {
+    const sec = document.getElementById('autores');
+    if (!sec) return;
+    // Solo actuar si la sección tiene contenido (fue cargada)
+    const grid = document.getElementById('autores-grid');
+    if (!grid || !grid.innerHTML.trim()) return;
+    sec.style.display = mostrar ? '' : 'none';
+    const navBtn = document.getElementById('nav-autores');
+    if (navBtn) navBtn.style.display = mostrar ? '' : 'none';
   }
 
   // ── INIT ──
