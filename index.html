@@ -896,6 +896,44 @@ body.loading::before {
   }
   .rival-fields-inner .a-label { color: #7A4A4A; }
 
+
+  /* Contador de votos rival */
+  .rival-contador {
+    display: flex; gap: 0; margin-top: 0.75rem;
+    width: 100%; height: 28px; border-radius: 3px;
+    overflow: hidden; border: 1px solid var(--divider);
+  }
+  .rival-contador-bar {
+    height: 100%; transition: width 0.6s ease;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--body); font-size: 0.7rem;
+    letter-spacing: 0.1em; font-weight: 600;
+    white-space: nowrap; overflow: hidden;
+    min-width: 0;
+  }
+  .rival-contador-bar.bar-rival {
+    background: #E8DCDC; color: #7A4A4A;
+  }
+  .rival-contador-bar.bar-diva {
+    background: var(--wine-pale); color: var(--wine);
+  }
+  .rival-contador-labels {
+    display: flex; justify-content: space-between;
+    font-family: var(--fell); font-style: italic;
+    font-size: 0.75rem; color: var(--ink-light);
+    margin-top: 0.5rem; padding: 0 0.25rem;
+    gap: 1.5rem;
+  }
+  .rival-contador-labels span {
+    flex: 1; text-align: center; padding: 0.3rem 0.5rem;
+  }
+  .rival-contador-labels span:first-child { text-align: left; }
+  .rival-contador-labels span:last-child  { text-align: right; }
+  @media (max-width: 480px) {
+    .rival-contador-labels { flex-direction: column; gap: 0.25rem; align-items: stretch; }
+    .rival-contador-labels span { text-align: center !important; padding: 0.2rem 0; }
+  }
+
 </style>
 </head>
 <body class="loading">
@@ -1622,21 +1660,18 @@ body.loading::before {
   let CONFIG = {};
 
   async function cargarConfig() {
-  try {
-    const r = await fetch(`${SB}/rest/v1/config?select=clave,valor`, { headers: GH });
-    const d = await r.json();
-    if (!Array.isArray(d)) return;
-    d.forEach(row => { CONFIG[row.clave] = row.valor; });
-    console.log('🎨 CONFIG cargada desde Supabase:', CONFIG);
-    aplicarConfig();
-  } catch(e) { 
-    console.error('Config error', e);
-  } finally {
-    // Quitar la clase loading cuando termine (éxito o error)
-    document.body.classList.remove('loading');
-    console.log('🔵 Clase loading removida');
+    try {
+      const r = await fetch(`${SB}/rest/v1/config?select=clave,valor`, { headers: GH });
+      const d = await r.json();
+      if (!Array.isArray(d)) return;
+      d.forEach(row => { CONFIG[row.clave] = row.valor; });
+      aplicarConfig();
+    } catch(e) {
+      console.error('Config error', e);
+    } finally {
+      document.body.classList.remove('loading');
+    }
   }
-}
 
   // ── Alineaciones de sección (definidas antes de aplicarConfig) ──
   const SEC_ALIGN_DEFS = [
@@ -2445,7 +2480,17 @@ function aplicarConfig() {
         <div class="rival-voto-resultado" id="rival-voto-resultado">
           ${votoActual ? (votoActual==='diva' ? 'Has elegido a la Diva. Buen gusto.' : 'Has elegido la original. Interesante.') : ''}
         </div>
+        <div class="rival-contador" id="rival-contador">
+          <div class="rival-contador-bar bar-rival" id="bar-rival" style="width:50%"></div>
+          <div class="rival-contador-bar bar-diva"  id="bar-diva"  style="width:50%"></div>
+        </div>
+        <div class="rival-contador-labels" id="rival-contador-labels">
+          <span id="label-rival">— votos original</span>
+          <span id="label-diva">— votos Diva</span>
+        </div>
       </div>`;
+    // Cargar contadores reales desde Supabase
+    cargarContadorRival(rec.id);
   } else {
     document.getElementById('receta-modal-contenido').innerHTML = `
       ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
@@ -3653,12 +3698,19 @@ function toggleNav() {
   }
 
   // ── Rival: votar ──
-  function votarRival(recId, opcion) {
+  async function votarRival(recId, opcion) {
     const key = `rival_voto_${recId}`;
+    const yaVotado = localStorage.getItem(key);
+    if (yaVotado) {
+      notif('Ya has votado en esta receta. ✦');
+      return;
+    }
+
+    // Guardar voto en localStorage
     localStorage.setItem(key, opcion);
-    document.querySelectorAll('.rival-voto-btn').forEach(b => {
-      b.classList.remove('votado-rival', 'votado-diva');
-    });
+
+    // Actualizar botones visualmente
+    document.querySelectorAll('.rival-voto-btn').forEach(b => b.classList.remove('votado-rival','votado-diva'));
     const btns = document.querySelectorAll('.rival-voto-btn');
     btns[0].classList.toggle('votado-rival', opcion === 'rival');
     btns[1].classList.toggle('votado-diva',  opcion === 'diva');
@@ -3666,6 +3718,58 @@ function toggleNav() {
     if (res) res.textContent = opcion === 'diva'
       ? 'Has elegido a la Diva. Buen gusto.'
       : 'Has elegido la original. Qué valiente.';
+
+    // Guardar en Supabase
+    try {
+      await fetch(`${SB}/rest/v1/votos_rival`, {
+        method: 'POST',
+        headers: { ...PH, Prefer: 'return=minimal' },
+        body: JSON.stringify({ receta_id: recId, opcion })
+      });
+    } catch(e) { /* silencioso */ }
+
+    // Actualizar contador
+    cargarContadorRival(recId);
+  }
+
+  async function cargarContadorRival(recId) {
+    try {
+      const r = await fetch(
+        `${SB}/rest/v1/votos_rival?receta_id=eq.${recId}&select=opcion`,
+        { headers: GH }
+      );
+      const votos = await r.json();
+      if (!Array.isArray(votos)) return;
+
+      const totalRival = votos.filter(v => v.opcion === 'rival').length;
+      const totalDiva  = votos.filter(v => v.opcion === 'diva').length;
+      const total      = totalRival + totalDiva;
+
+      const barRival = document.getElementById('bar-rival');
+      const barDiva  = document.getElementById('bar-diva');
+      const lblR     = document.getElementById('label-rival');
+      const lblD     = document.getElementById('label-diva');
+      if (!barRival || !barDiva) return;
+
+      if (total === 0) {
+        barRival.style.width = '50%'; barRival.textContent = '';
+        barDiva.style.width  = '50%'; barDiva.textContent  = '';
+        if (lblR) lblR.textContent = 'Sin votos aún';
+        if (lblD) lblD.textContent = '';
+        return;
+      }
+
+      const pctR = Math.round((totalRival / total) * 100);
+      const pctD = 100 - pctR;
+
+      barRival.style.width = pctR + '%';
+      barDiva.style.width  = pctD + '%';
+      barRival.textContent = pctR > 12 ? pctR + '%' : '';
+      barDiva.textContent  = pctD > 12 ? pctD + '%' : '';
+
+      if (lblR) lblR.textContent = `${totalRival} voto${totalRival !== 1 ? 's' : ''} original`;
+      if (lblD) lblD.textContent = `${totalDiva} voto${totalDiva !== 1 ? 's' : ''} Diva`;
+    } catch(e) { /* silencioso */ }
   }
 
 
