@@ -633,6 +633,262 @@ body.loading::before {
   50% { transform: translate(-50%, -50%) rotate(10deg); }
   100% { transform: translate(-50%, -50%) rotate(0deg); }
 }
+
+  /* ── LA ALACENA MÁGICA ── */
+  /* Alacena como sub-apartado dentro de Recetas */
+  .alacena-sub {
+    margin-top: 3rem;
+    border-top: 1px solid var(--divider);
+    padding-top: 2.5rem;
+  }
+  .alacena-header { text-align: center; margin-bottom: 2rem; }
+  .alacena-header h2 {
+    font-family: var(--serif); font-size: 1.6rem;
+    font-weight: 700; font-style: italic; margin-bottom: 0.3rem;
+    color: var(--wine);
+  }
+  .alacena-header p {
+    font-family: var(--fell); font-style: italic;
+    font-size: 0.9rem; color: var(--ink-light);
+  }
+  .alacena-form {
+    display: flex; flex-wrap: wrap;
+    gap: 0.75rem; align-items: flex-end;
+    max-width: 680px; margin: 0 auto 2rem;
+  }
+  .alacena-field {
+    flex: 1; min-width: 140px;
+    display: flex; flex-direction: column; gap: 0.3rem;
+  }
+  .alacena-field label {
+    font-family: var(--body); font-size: 0.68rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-light);
+  }
+  .alacena-field input {
+    background: var(--cream); border: 1px solid var(--divider);
+    font-family: var(--body); font-size: 1rem; color: var(--ink);
+    padding: 0.65rem 0.85rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .alacena-field input:focus { border-color: var(--wine); }
+  .alacena-field input::placeholder { color: var(--divider); font-style: italic; }
+  .alacena-btn {
+    background: var(--wine); color: var(--cream); border: none;
+    font-family: var(--body); font-size: 0.78rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 0.68rem 1.5rem; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+    align-self: flex-end;
+  }
+  .alacena-btn:hover:not(:disabled) { background: var(--ink); }
+  .alacena-btn:disabled { opacity: 0.6; cursor: wait; }
+
+  /* Respuesta de la Diva */
+  .alacena-respuesta {
+    max-width: 680px; margin: 0 auto;
+    display: none;
+  }
+  .alacena-respuesta.visible { display: block; }
+  .alacena-card {
+    background: var(--cream);
+    border: 1px solid var(--divider);
+    border-left: 4px solid var(--wine);
+    padding: 1.75rem 2rem;
+  }
+  .alacena-card-kicker {
+    font-family: var(--body); font-size: 0.65rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 0.5rem;
+  }
+  .alacena-card-titulo {
+    font-family: var(--serif); font-size: 1.4rem;
+    font-weight: 700; font-style: italic;
+    color: var(--wine); margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .alacena-card-cuerpo {
+    font-family: var(--body); font-size: 1rem;
+    line-height: 1.85; color: var(--ink);
+    text-align: justify; hyphens: auto;
+  }
+  .alacena-card-cuerpo p { margin-bottom: 0.85rem; }
+  .alacena-card-cuerpo p:last-child { margin-bottom: 0; }
+  .alacena-toque {
+    margin-top: 1.25rem; padding-top: 1rem;
+    border-top: 1px solid var(--divider);
+    font-family: var(--fell); font-style: italic;
+    font-size: 0.92rem; color: var(--wine-light);
+    line-height: 1.6;
+  }
+  .alacena-ingredientes {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .alacena-ing-tag {
+    font-family: var(--body); font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--wine); border: 1px solid var(--wine);
+    padding: 0.15rem 0.6rem;
+  }
+  .alacena-loading {
+    text-align: center; padding: 2rem 0;
+    font-family: var(--fell); font-style: italic;
+    color: var(--ink-light); font-size: 0.95rem;
+  }
+  .alacena-loading::after {
+    content: ''; display: inline-block;
+    width: 0.5rem; height: 0.5rem;
+    background: var(--wine); border-radius: 50%;
+    margin-left: 0.5rem;
+    animation: parpadeo 1s infinite;
+  }
+  @keyframes parpadeo { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+
+  /* ── LA RECETA DE LA RIVAL ── */
+  .receta-modal-inner.es-rival { max-width: 960px; }
+
+  .rival-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border: 1px solid var(--divider); margin-bottom: 1.5rem;
+  }
+  @media (max-width: 640px) { .rival-grid { grid-template-columns: 1fr; } }
+
+  .rival-col {
+    padding: 1.5rem 1.75rem;
+  }
+  .rival-col-original {
+    background: #F5F0F0;
+    border-right: 1px solid var(--divider);
+  }
+  @media (max-width: 640px) {
+    .rival-col-original { border-right: none; border-bottom: 1px solid var(--divider); }
+  }
+  .rival-col-diva { background: var(--cream); }
+
+  .rival-etiqueta {
+    font-family: var(--body); font-size: 0.62rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    padding: 0.2rem 0.6rem; display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  .rival-etiqueta-original {
+    background: #E8DCDC; color: #7A4A4A;
+    border: 1px solid #C9AFAF;
+  }
+  .rival-etiqueta-diva {
+    background: var(--wine-pale); color: var(--wine);
+    border: 1px solid var(--wine);
+  }
+  .rival-titulo {
+    font-family: var(--serif); font-size: 1.15rem;
+    font-weight: 700; line-height: 1.2; margin-bottom: 1rem;
+  }
+  .rival-col-original .rival-titulo { color: #7A4A4A; font-style: italic; }
+  .rival-col-diva    .rival-titulo { color: var(--wine); }
+
+  .rival-seccion { margin-bottom: 1rem; }
+  .rival-seccion h5 {
+    font-family: var(--fell); font-size: 0.68rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding-bottom: 0.3rem; margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--divider);
+  }
+  .rival-col-original .rival-seccion h5 { color: #9A6A6A; }
+  .rival-col-diva    .rival-seccion h5 { color: var(--wine); }
+
+  .rival-seccion ul { list-style: none; }
+  .rival-seccion li {
+    font-family: var(--body); font-size: 0.9rem;
+    line-height: 1.65; padding: 0.18rem 0;
+    border-bottom: 1px dotted var(--divider); color: var(--ink);
+  }
+  .rival-seccion li:last-child { border-bottom: none; }
+  .rival-col-original .rival-seccion li::before { content: "✗ "; color: #C09090; font-size: 0.6rem; }
+  .rival-col-diva     .rival-seccion li::before { content: "✦ "; color: var(--gold); font-size: 0.6rem; }
+
+  .rival-pasos p {
+    font-family: var(--body); font-size: 0.9rem;
+    line-height: 1.7; color: var(--ink); margin-bottom: 0.4rem;
+  }
+
+  .rival-critica {
+    background: var(--gold-pale); border-left: 3px solid var(--gold);
+    padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+    font-family: var(--fell); font-style: italic;
+    font-size: 0.95rem; color: var(--ink); line-height: 1.6;
+  }
+  .rival-critica strong {
+    font-family: var(--body); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--wine); font-style: normal; display: block;
+    margin-bottom: 0.3rem;
+  }
+  .rival-moraleja {
+    text-align: center; font-family: var(--serif);
+    font-size: 1.05rem; font-style: italic; color: var(--wine);
+    padding: 1rem 1.5rem; border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider); margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  /* Botón de voto */
+  .rival-voto {
+    display: flex; gap: 0.75rem; flex-wrap: wrap;
+    align-items: center; justify-content: center;
+    margin-bottom: 1.5rem; padding: 1.25rem;
+    background: var(--cream-dark);
+  }
+  .rival-voto-label {
+    font-family: var(--fell); font-style: italic;
+    font-size: 0.92rem; color: var(--ink-light);
+    width: 100%; text-align: center; margin-bottom: 0.5rem;
+  }
+  .rival-voto-btn {
+    font-family: var(--body); font-size: 0.75rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.6rem 1.25rem; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--cream);
+    color: var(--ink); transition: all 0.15s;
+  }
+  .rival-voto-btn:hover { border-color: var(--wine); color: var(--wine); }
+  .rival-voto-btn.votado-rival { background: #E8DCDC; color: #7A4A4A; border-color: #C9AFAF; }
+  .rival-voto-btn.votado-diva  { background: var(--wine-pale); color: var(--wine); border-color: var(--wine); }
+  .rival-voto-resultado {
+    font-family: var(--body); font-size: 0.82rem;
+    color: var(--ink-light); width: 100%; text-align: center;
+    font-style: italic; margin-top: 0.25rem;
+  }
+
+  /* Badge en tarjeta del recetario */
+  .receta-rival-badge {
+    display: inline-block; font-family: var(--body);
+    font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+    background: var(--wine-pale); color: var(--wine);
+    border: 1px solid var(--wine); padding: 0.1rem 0.5rem;
+    margin-top: 0.4rem;
+  }
+
+  /* Admin: campos rival ocultos */
+  .rival-fields { display: none; }
+  .rival-fields.visible { display: block; }
+  .rival-toggle {
+    background: none; border: 1px solid var(--wine-light);
+    color: var(--wine); font-family: var(--body); font-size: 0.72rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.4rem 0.85rem; cursor: pointer; margin-top: 0.75rem;
+    transition: all 0.15s;
+  }
+  .rival-toggle:hover, .rival-toggle.activo {
+    background: var(--wine); color: var(--cream); border-color: var(--wine);
+  }
+  .rival-fields-inner {
+    border: 1px solid var(--wine-pale); background: #FBF4F4;
+    padding: 1.25rem; margin-top: 0.75rem;
+  }
+  .rival-fields-inner .a-label { color: #7A4A4A; }
+
 </style>
 </head>
 <body class="loading">
@@ -794,6 +1050,36 @@ body.loading::before {
       <div class="ornament-divider" id="sec-recetas-divider" style="margin:1.5rem 0;"><span class="icon">✦ ✦ ✦</span></div>
       <div class="recetas-grid" id="recetas-grid"></div>
       <div class="cartas-paginacion" id="recetas-paginacion" style="display:none;"></div>
+
+      <!-- ══ LA ALACENA MÁGICA — sub-apartado ══ -->
+      <div class="alacena-sub" id="alacena">
+        <div class="ornament-divider"><span class="icon">✦ ✦ ✦</span></div>
+        <div class="alacena-header">
+          <h2>La Alacena Mágica</h2>
+          <p>Dime qué tienes en casa y la Diva busca en su recetario.</p>
+        </div>
+        <div class="alacena-form">
+          <div class="alacena-field">
+            <label>Primer ingrediente</label>
+            <input type="text" id="ing-1" placeholder="ej. huevos" maxlength="40"
+              onkeydown="if(event.key==='Enter')document.getElementById('ing-2').focus()">
+          </div>
+          <div class="alacena-field">
+            <label>Segundo ingrediente</label>
+            <input type="text" id="ing-2" placeholder="ej. tomate" maxlength="40"
+              onkeydown="if(event.key==='Enter')document.getElementById('ing-3').focus()">
+          </div>
+          <div class="alacena-field">
+            <label>Tercer ingrediente</label>
+            <input type="text" id="ing-3" placeholder="ej. queso viejo" maxlength="40"
+              onkeydown="if(event.key==='Enter')consultarAlacena()">
+          </div>
+          <button class="alacena-btn" id="alacena-btn" onclick="consultarAlacena()">
+            ¿Qué hago? ✦
+          </button>
+        </div>
+        <div class="alacena-respuesta" id="alacena-respuesta"></div>
+      </div>
     </div>
   </section>
 
@@ -858,6 +1144,9 @@ body.loading::before {
       </div>
     </div>
   </div>
+
+
+
 </main>
 
 <footer>
@@ -1065,7 +1354,34 @@ body.loading::before {
           <textarea id="rec-pasos" class="a-input" rows="5" placeholder="Un paso por línea"></textarea>
           <label class="a-label">URL foto (opcional)</label>
           <input type="text" id="rec-foto" class="a-input" placeholder="https://...">
-          <button class="a-btn" onclick="publicarReceta()">Publicar receta ✦</button>
+
+          <!-- Campos de La Rival -->
+          <button type="button" class="rival-toggle" id="rival-toggle-btn"
+            onclick="toggleRivalFields()">⚔ Convertir en Receta de la Rival</button>
+
+          <div class="rival-fields" id="rival-fields">
+            <div class="rival-fields-inner">
+              <div style="font-family:var(--fell);font-style:italic;font-size:0.82rem;color:#7A4A4A;margin-bottom:1rem;">
+                Rellena estos campos para activar el formato Rival vs Diva.
+              </div>
+              <label class="a-label">Título de la receta original (la rival)</label>
+              <input type="text" id="rec-rival-titulo" class="a-input" placeholder="La insípida bechamel de mi cuñada">
+              <label class="a-label">Ingredientes originales</label>
+              <textarea id="rec-rival-ingredientes" class="a-input" rows="4"
+                placeholder="Un ingrediente por línea — los de la versión original"></textarea>
+              <label class="a-label">Pasos originales</label>
+              <textarea id="rec-rival-pasos" class="a-input" rows="4"
+                placeholder="Un paso por línea — cómo lo hace la rival"></textarea>
+              <label class="a-label">Crítica de la Diva</label>
+              <textarea id="rec-rival-critica" class="a-input" rows="3"
+                placeholder="El diagnóstico elegante de lo que falló y por qué la versión Diva lo resuelve"></textarea>
+              <label class="a-label">Moraleja</label>
+              <input type="text" id="rec-rival-moraleja" class="a-input"
+                placeholder="La lección que deja esta historia culinaria">
+            </div>
+          </div>
+
+          <button class="a-btn" onclick="publicarReceta()" style="margin-top:0.75rem;">Publicar receta ✦</button>
           <div class="a-msg" id="msg-receta"></div>
         </div>
         <div class="admin-box">
@@ -1450,41 +1766,67 @@ function aplicarConfig() {
   // ── CONTADOR DE LECTORAS ──
   // Registra una lectura y actualiza el widget. Usa localStorage para no contar recargas.
   async function registrarLectura(columnaId) {
-  const key = `leida_${columnaId}`;
-  const yaLeida = localStorage.getItem(key);
-  
-  if (!yaLeida) {
-    try {
-      await fetch(`${SB}/rest/v1/rpc/incrementar_lecturas`, {
-        method: 'POST', headers: PH,
-        body: JSON.stringify({ p_columna_id: columnaId })
-      });
-      localStorage.setItem(key, '1');
-    } catch(e) {
-      console.error('Error al registrar lectura:', e);
+    // Usa sessionStorage: cuenta una vez por sesión (por pestaña abierta)
+    // Así tus propias pruebas cuentan al abrir una pestaña nueva
+    const key = `leida_sesion_${columnaId}`;
+    const yaLeida = sessionStorage.getItem(key);
+
+    if (!yaLeida) {
+      sessionStorage.setItem(key, '1');
+      try {
+        // 1. Lee el valor actual
+        const r1 = await fetch(
+          `${SB}/rest/v1/lecturas_columnas?columna_id=eq.${columnaId}`,
+          { headers: GH }
+        );
+        const d1 = await r1.json();
+
+        if (Array.isArray(d1) && d1.length > 0) {
+          // 2a. Fila existe → PATCH suma 1
+          const actual = d1[0].lecturas || 0;
+          await fetch(
+            `${SB}/rest/v1/lecturas_columnas?columna_id=eq.${columnaId}`,
+            {
+              method: 'PATCH',
+              headers: { ...PH, Prefer: 'return=minimal' },
+              body: JSON.stringify({ lecturas: actual + 1, updated_at: new Date().toISOString() })
+            }
+          );
+        } else {
+          // 2b. Fila nueva → INSERT
+          await fetch(
+            `${SB}/rest/v1/lecturas_columnas`,
+            {
+              method: 'POST',
+              headers: { ...PH, Prefer: 'return=minimal' },
+              body: JSON.stringify({ columna_id: columnaId, lecturas: 1 })
+            }
+          );
+        }
+      } catch(e) {
+        console.warn('Contador: error al registrar lectura', e);
+      }
     }
+
+    // Siempre muestra el número actualizado
+    mostrarLectoras(columnaId);
   }
-  
-  // 👇 SIEMPRE mostrar el contador actualizado, aunque ya haya leído
-  mostrarLectoras(columnaId);
-}
 
   async function mostrarLectoras(columnaId) {
-  try {
-    const r = await fetch(`${SB}/rest/v1/lecturas_columnas?columna_id=eq.${columnaId}`, { headers: GH });
-    const d = await r.json();
-    const count = (Array.isArray(d) && d[0]) ? (d[0].lecturas || 0) : 0;
-    const numSpan = document.getElementById('lectoras-num');
-    if (numSpan) {
-      numSpan.textContent = count.toLocaleString('es-ES');
-      console.log(`✅ Contador actualizado: ${count} lecturas para columna ${columnaId}`);
+    try {
+      const r = await fetch(
+        `${SB}/rest/v1/lecturas_columnas?columna_id=eq.${columnaId}`,
+        { headers: GH }
+      );
+      const d = await r.json();
+      const count = (Array.isArray(d) && d[0]) ? (d[0].lecturas || 0) : 0;
+      const numSpan = document.getElementById('lectoras-num');
+      if (numSpan) numSpan.textContent = count.toLocaleString('es-ES');
+    } catch(e) {
+      const numSpan = document.getElementById('lectoras-num');
+      if (numSpan) numSpan.textContent = '—';
     }
-  } catch(e) {
-    console.error('Error al mostrar lecturas:', e);
-    const numSpan = document.getElementById('lectoras-num');
-    if (numSpan) numSpan.textContent = '—';
   }
-}
 
   async function cargarColumna() {
     try {
@@ -1933,6 +2275,7 @@ function aplicarConfig() {
           </div>
           <div class="receta-card-body">
             <div class="receta-titulo">${rec.titulo}</div>
+            ${rec.receta_original_titulo ? '<div class="receta-rival-badge">⚔ vs La Rival</div>' : ''}
             <div class="receta-desc" data-full="${desc.replace(/"/g,'&quot;')}" data-expanded="false">${descVisible}</div>
             ${corta ? `<button class="receta-leer-mas" onclick="toggleLeerMasReceta(this,event)">Leer más ✦</button>` : ''}
             <span class="receta-ver">Ver receta →</span>
@@ -2037,19 +2380,77 @@ function aplicarConfig() {
     </div>` : '';
   
   // --- MONTAR EL MODAL ---
-  document.getElementById('receta-modal-contenido').innerHTML = `
-    ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
-    <div class="receta-modal-kicker">Receta de la Diva</div>
-    <div class="receta-modal-titulo">${rec.titulo}</div>
-    ${rec.descripcion ? `<div class="receta-modal-desc">${rec.descripcion}</div>` : ''}
-    ${ingredientesHTML}
-    ${pasosHTML}
-    ${rec.toque_diva ? `
-      <div class="receta-toque-diva">
-        <h4>✦ Toque de la Diva</h4>
-        <p>${rec.toque_diva}</p>
-      </div>` : ''}`;
-  
+  const esRival = !!rec.receta_original_titulo;
+  const modalInner = document.querySelector('.receta-modal-inner');
+  modalInner.classList.toggle('es-rival', esRival);
+
+  if (esRival) {
+    // Procesar ingredientes y pasos ORIGINALES
+    const ingOrigLines = (rec.ingredientes_originales || '').split('\n').filter(l => l.trim());
+    const ingOrigHTML = ingOrigLines.length
+      ? `<ul>${ingOrigLines.map(i => `<li>${i.trim()}</li>`).join('')}</ul>`
+      : '';
+    const pasosOrigLines = (rec.pasos_originales || '').split('\n').filter(l => l.trim());
+    const pasosOrigHTML = pasosOrigLines.map(p => `<p>${p.trim()}</p>`).join('');
+
+    // Voto guardado en localStorage
+    const votoKey = `rival_voto_${rec.id}`;
+    const votoActual = localStorage.getItem(votoKey); // 'rival' | 'diva' | null
+
+    document.getElementById('receta-modal-contenido').innerHTML = `
+      ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
+      <div class="receta-modal-kicker">⚔ La Receta de la Rival</div>
+      ${rec.critica_diva ? `
+        <div class="rival-critica">
+          <strong>✦ Dictamen de la Diva</strong>
+          ${rec.critica_diva}
+        </div>` : ''}
+      <div class="rival-grid">
+        <div class="rival-col rival-col-original">
+          <div class="rival-etiqueta rival-etiqueta-original">La Rival</div>
+          <div class="rival-titulo">${rec.receta_original_titulo}</div>
+          ${ingOrigHTML ? `<div class="rival-seccion"><h5>Ingredientes</h5><ul>${ingOrigLines.map(i=>`<li>${i.trim()}</li>`).join('')}</ul></div>` : ''}
+          ${pasosOrigHTML ? `<div class="rival-seccion rival-pasos"><h5>Preparación</h5>${pasosOrigHTML}</div>` : ''}
+        </div>
+        <div class="rival-col rival-col-diva">
+          <div class="rival-etiqueta rival-etiqueta-diva">La Versión de la Diva</div>
+          <div class="rival-titulo">${rec.titulo}</div>
+          ${rec.descripcion ? `<div style="font-family:var(--fell);font-style:italic;font-size:0.88rem;color:var(--ink-light);margin-bottom:0.85rem;">${rec.descripcion}</div>` : ''}
+          ${ingredientesHTML}
+          ${pasosHTML}
+          ${rec.toque_diva ? `<div class="rival-seccion"><h5>Toque de la Diva</h5><p style="font-family:var(--body);font-style:italic;font-size:0.9rem;color:var(--ink);">${rec.toque_diva}</p></div>` : ''}
+        </div>
+      </div>
+      ${rec.moraleja ? `<div class="rival-moraleja">"${rec.moraleja}"</div>` : ''}
+      <div class="rival-voto" id="rival-voto-wrap">
+        <div class="rival-voto-label">¿Cuál servirías tú?</div>
+        <button class="rival-voto-btn ${votoActual==='rival'?'votado-rival':''}"
+          onclick="votarRival(${rec.id},'rival')">
+          La receta original
+        </button>
+        <button class="rival-voto-btn ${votoActual==='diva'?'votado-diva':''}"
+          onclick="votarRival(${rec.id},'diva')">
+          La versión de la Diva ✦
+        </button>
+        <div class="rival-voto-resultado" id="rival-voto-resultado">
+          ${votoActual ? (votoActual==='diva' ? 'Has elegido a la Diva. Buen gusto.' : 'Has elegido la original. Interesante.') : ''}
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('receta-modal-contenido').innerHTML = `
+      ${rec.foto_url ? `<img src="${rec.foto_url}" class="receta-modal-foto" alt="${rec.titulo}" onerror="this.style.display='none'">` : ''}
+      <div class="receta-modal-kicker">Receta de la Diva</div>
+      <div class="receta-modal-titulo">${rec.titulo}</div>
+      ${rec.descripcion ? `<div class="receta-modal-desc">${rec.descripcion}</div>` : ''}
+      ${ingredientesHTML}
+      ${pasosHTML}
+      ${rec.toque_diva ? `
+        <div class="receta-toque-diva">
+          <h4>✦ Toque de la Diva</h4>
+          <p>${rec.toque_diva}</p>
+        </div>` : ''}`;
+  }
+
   document.getElementById('receta-modal').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -2608,15 +3009,22 @@ function toggleNav() {
     const ingredientes = document.getElementById('rec-ingredientes').value.trim();
     const toque_diva   = document.getElementById('rec-toque-diva').value.trim() || null;
     const pasos        = document.getElementById('rec-pasos').value.trim();
-    const foto_url     = document.getElementById('rec-foto').value.trim() || null;
+    const foto_url                = document.getElementById('rec-foto').value.trim() || null;
+    const receta_original_titulo  = document.getElementById('rec-rival-titulo')?.value.trim() || null;
+    const ingredientes_originales = document.getElementById('rec-rival-ingredientes')?.value.trim() || null;
+    const pasos_originales        = document.getElementById('rec-rival-pasos')?.value.trim() || null;
+    const critica_diva            = document.getElementById('rec-rival-critica')?.value.trim() || null;
+    const moraleja                = document.getElementById('rec-rival-moraleja')?.value.trim() || null;
     if (!titulo) { setMsg('msg-receta', 'El título es obligatorio.'); return; }
     try {
       const r = await fetch(`${SB}/rest/v1/recetas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, descripcion, ingredientes, toque_diva, pasos, foto_url, activa: true })
+        body: JSON.stringify({ titulo, descripcion, ingredientes, toque_diva, pasos, foto_url, activa: true, receta_original_titulo, ingredientes_originales, pasos_originales, critica_diva, moraleja })
       });
       if (!r.ok) throw new Error(await r.text());
-      ['rec-titulo','rec-desc','rec-ingredientes','rec-toque-diva','rec-pasos','rec-foto'].forEach(id => document.getElementById(id).value = '');
+      ['rec-titulo','rec-desc','rec-ingredientes','rec-toque-diva','rec-pasos','rec-foto','rec-rival-titulo','rec-rival-ingredientes','rec-rival-pasos','rec-rival-critica','rec-rival-moraleja'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('rival-fields')?.classList.remove('visible');
+      document.getElementById('rival-toggle-btn')?.classList.remove('activo');
       setMsg('msg-receta', '✦ Receta publicada.');
       await Promise.all([cargarListaRecetas(), cargarRecetas()]);
     } catch(e) {
@@ -3090,6 +3498,164 @@ function toggleNav() {
     } catch(e) {
       msg.textContent = 'Error al guardar. Intenta de nuevo.';
     }
+  }
+
+
+  // ══════════════════════════════════════════════
+  //  LA ALACENA MÁGICA — busca en recetas publicadas
+  // ══════════════════════════════════════════════
+  async function consultarAlacena() {
+    const i1 = document.getElementById('ing-1').value.trim().toLowerCase();
+    const i2 = document.getElementById('ing-2').value.trim().toLowerCase();
+    const i3 = document.getElementById('ing-3').value.trim().toLowerCase();
+
+    if (!i1 || !i2 || !i3) {
+      notif('Escribe los tres ingredientes para que la Diva pueda ayudarte.');
+      return;
+    }
+
+    const btn  = document.getElementById('alacena-btn');
+    const wrap = document.getElementById('alacena-respuesta');
+    btn.disabled = true;
+    btn.textContent = 'La Diva consulta su alacena…';
+    wrap.className  = 'alacena-respuesta visible';
+    wrap.innerHTML  = '<div class="alacena-loading">Buscando en la alacena</div>';
+
+    try {
+      // Traer todas las recetas publicadas
+      const r = await fetch(
+        `${SB}/rest/v1/recetas?activa=eq.true&order=created_at.desc`,
+        { headers: GH }
+      );
+      const recetas = await r.json();
+
+      if (!Array.isArray(recetas) || !recetas.length) {
+        wrap.innerHTML = renderAlacenaVacia(i1, i2, i3);
+        return;
+      }
+
+      const ingredientes = [i1, i2, i3];
+
+      // Puntuar cada receta según coincidencias con los ingredientes buscados
+      const puntuadas = recetas.map(rec => {
+        // Texto donde buscar: título + descripción + ingredientes + pasos
+        const texto = [
+          rec.titulo        || '',
+          rec.descripcion   || '',
+          rec.ingredientes  || '',
+          rec.pasos         || '',
+          rec.toque_diva    || ''
+        ].join(' ').toLowerCase();
+
+        // Contar cuántos ingredientes aparecen en el texto de la receta
+        const puntos = ingredientes.reduce((acc, ing) => {
+          // Divide el ingrediente en palabras (ej. "queso viejo" → "queso","viejo")
+          const palabras = ing.split(/\s+/).filter(p => p.length > 2);
+          const coincide = palabras.some(p => texto.includes(p));
+          return acc + (coincide ? 1 : 0);
+        }, 0);
+
+        return { rec, puntos };
+      });
+
+      // Ordenar por puntuación descendente
+      puntuadas.sort((a, b) => b.puntos - a.puntos);
+      const mejor = puntuadas[0];
+
+      if (mejor.puntos === 0) {
+        wrap.innerHTML = renderAlacenaVacia(i1, i2, i3);
+        return;
+      }
+
+      // Mostrar la receta ganadora
+      const rec   = mejor.rec;
+      const match = mejor.puntos;
+      const desc  = rec.descripcion
+        ? rec.descripcion.slice(0, 200) + (rec.descripcion.length > 200 ? '…' : '')
+        : '';
+
+      wrap.innerHTML = `
+        <div class="alacena-card">
+          <div class="alacena-card-kicker">
+            ✦ La Diva encontró algo — ${match} de 3 ingrediente${match>1?'s coinciden':'coincide'}
+          </div>
+          <div class="alacena-ingredientes">
+            <span class="alacena-ing-tag">${i1}</span>
+            <span class="alacena-ing-tag">${i2}</span>
+            <span class="alacena-ing-tag">${i3}</span>
+          </div>
+          <div class="alacena-card-titulo">${rec.titulo || ''}</div>
+          ${desc ? `<div class="alacena-card-cuerpo"><p><em>${desc}</em></p></div>` : ''}
+          <div class="alacena-toque" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+            <span>✦ Haz clic para ver la receta completa con ingredientes y preparación.</span>
+            <button onclick="abrirReceta(${rec.id})" style="background:var(--wine);color:var(--cream);border:none;font-family:var(--body);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 1rem;cursor:pointer;">Ver receta →</button>
+          </div>
+        </div>
+        ${puntuadas.filter((p,i) => i>0 && p.puntos>0).length > 0 ? `
+        <div style="font-family:var(--fell);font-style:italic;font-size:0.82rem;color:var(--ink-light);margin-top:0.75rem;text-align:center;">
+          También podrían interesarte:
+          ${puntuadas.filter((p,i)=>i>0&&p.puntos>0).slice(0,2).map(p=>
+            `<button onclick="abrirReceta(${p.rec.id})" style="background:none;border:none;color:var(--wine);font-family:var(--body);font-size:0.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">${p.rec.titulo}</button>`
+          ).join(' · ')}
+        </div>` : ''}`;
+
+    } catch(e) {
+      wrap.innerHTML = `
+        <div class="alacena-card">
+          <div class="alacena-card-kicker">✦ La alacena está cerrada</div>
+          <div class="alacena-card-cuerpo">
+            <p>No se pudo acceder al recetario en este momento. Inténtalo de nuevo.</p>
+          </div>
+        </div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '¿Qué hago? ✦';
+    }
+  }
+
+  function renderAlacenaVacia(i1, i2, i3) {
+    return `
+      <div class="alacena-card">
+        <div class="alacena-card-kicker">✦ La Diva consulta su recetario…</div>
+        <div class="alacena-ingredientes">
+          <span class="alacena-ing-tag">${i1}</span>
+          <span class="alacena-ing-tag">${i2}</span>
+          <span class="alacena-ing-tag">${i3}</span>
+        </div>
+        <div class="alacena-card-titulo">Receta pendiente de publicar</div>
+        <div class="alacena-card-cuerpo">
+          <p>Aún no hay ninguna receta publicada con esos ingredientes. Puede que sea una señal para que la Diva la escriba pronto.</p>
+        </div>
+        <div class="alacena-toque">
+          ✦ ¿Tienes una receta con ${i1}, ${i2} y ${i3}? Envíala como carta — podría convertirse en la próxima receta de la Diva.
+        </div>
+      </div>`;
+  }
+
+
+  // ── Rival: toggle campos admin ──
+  function toggleRivalFields() {
+    const fields = document.getElementById('rival-fields');
+    const btn    = document.getElementById('rival-toggle-btn');
+    const visible = fields.classList.toggle('visible');
+    btn.classList.toggle('activo', visible);
+    btn.textContent = visible ? '⚔ Quitar formato Rival' : '⚔ Convertir en Receta de la Rival';
+  }
+
+  // ── Rival: votar ──
+  function votarRival(recId, opcion) {
+    const key = `rival_voto_${recId}`;
+    localStorage.setItem(key, opcion);
+    document.querySelectorAll('.rival-voto-btn').forEach(b => {
+      b.classList.remove('votado-rival', 'votado-diva');
+    });
+    const btns = document.querySelectorAll('.rival-voto-btn');
+    btns[0].classList.toggle('votado-rival', opcion === 'rival');
+    btns[1].classList.toggle('votado-diva',  opcion === 'diva');
+    const res = document.getElementById('rival-voto-resultado');
+    if (res) res.textContent = opcion === 'diva'
+      ? 'Has elegido a la Diva. Buen gusto.'
+      : 'Has elegido la original. Qué valiente.';
   }
 
   // ── INIT ──
