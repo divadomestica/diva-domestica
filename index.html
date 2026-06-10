@@ -250,13 +250,14 @@
   /* Panel desplegable de ediciones del mes */
   #archivo-mes-panel {
     display: none; position: fixed; inset: 0;
-    background: rgba(46,36,40,0.7); z-index: 300;
-    align-items: flex-end; justify-content: center;
+    background: rgba(46,36,40,0.72); z-index: 300;
+    align-items: center; justify-content: center;
+    padding: 1.5rem 1rem; overflow-y: auto;
   }
   #archivo-mes-panel.visible { display: flex; }
   .archivo-panel-inner {
-    background: var(--cream); width: 100%; max-width: 960px;
-    max-height: 70vh; overflow-y: auto;
+    background: var(--cream); width: 100%; max-width: 860px;
+    max-height: 85vh; overflow-y: auto;
     border-top: 3px solid var(--wine);
     padding: 0 0 2rem;
   }
@@ -535,6 +536,8 @@ body.loading::before {
     cursor: pointer; transition: color 0.18s, border-color 0.18s;
   }
   .byline-autor-link:hover { color: var(--wine); border-color: var(--wine); }
+  .byline-multi-wrap { display: inline; }
+  .byline-multi-wrap .byline-autor-link { font-size: 0.8rem; vertical-align: middle; }
 
   /* perfil individual — modal bottom-sheet */
   #perfil-modal { display: none; position: fixed; inset: 0; background: rgba(46,36,40,0.72); z-index: 400; }
@@ -605,7 +608,7 @@ body.loading::before {
   }
   .perfil-col-row:last-child { border-bottom: none; }
   .perfil-col-row:hover { background: var(--gold-pale); }
-  .perfil-col-num { font-family: var(--serif); font-size: 0.75rem; font-style: italic; color: var(--wine-light); min-width: 3rem; padding-top: 0.12rem; flex-shrink: 0; }
+  .perfil-col-num { font-family: var(--body); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; font-style: normal; color: var(--wine-light); min-width: 3rem; padding-top: 0.15rem; flex-shrink: 0; }
   .perfil-col-titulo { font-family: var(--body); font-size: 0.95rem; font-weight: 600; color: var(--ink); line-height: 1.3; margin-bottom: 0.08rem; }
   .perfil-col-fecha { font-family: var(--fell); font-style: italic; font-size: 0.75rem; color: var(--ink-light); }
   .perfil-col-arrow { font-size: 0.75rem; color: var(--wine-light); align-self: center; flex-shrink: 0; transition: transform 0.15s; }
@@ -915,10 +918,13 @@ body.loading::before {
               <input type="text" id="a-byline" class="a-input" placeholder="Por Constanza Villanueva-Roth">
             </div>
           </div>
-          <label class="a-label">Autora — vincula el byline a su perfil (opcional)</label>
-          <select id="a-autor-slug" class="a-input">
-            <option value="">— Sin autora vinculada —</option>
-          </select>
+          <label class="a-label">Autoras vinculadas — puede seleccionar más de una</label>
+          <div id="autoras-check-wrap" style="border:1px solid var(--divider);background:var(--cream-dark);padding:0.65rem 0.85rem;max-height:160px;overflow-y:auto;margin-bottom:0.4rem;">
+            <span style="font-family:var(--body);font-size:0.88rem;color:var(--ink-light);font-style:italic;">Cargando autoras registradas…</span>
+          </div>
+          <div style="font-family:var(--body);font-size:0.72rem;color:var(--ink-light);letter-spacing:0.05em;margin-bottom:0.2rem;">
+            Si no hay autoras aún, regístralas primero en la pestaña <strong>Autoras</strong>.
+          </div>
           <label class="a-label">Título</label>
           <input type="text" id="a-titulo" class="a-input" placeholder="El misterio de...">
           <label class="a-label">URL foto de portada (opcional)</label>
@@ -1523,7 +1529,7 @@ function aplicarConfig() {
       el.innerHTML = `
         <div class="article-kicker">${c.kicker || 'La Columna de la Semana'}</div>
         <h2>${c.titulo || ''}</h2>
-        <div class="article-byline">${bylineConEnlace(c.byline, c.autor_slug)} &nbsp;·&nbsp; Ilustraciones de la casa &nbsp;·&nbsp; <em>Columna semanal</em></div>
+        <div class="article-byline">${bylineConEnlace(c.byline, c.autor_slugs || c.autor_slug)} &nbsp;·&nbsp; Ilustraciones de la casa &nbsp;·&nbsp; <em>Columna semanal</em></div>
         ${parrafosHTML.join('')}`;
 
       // pull quote al final si la posición es final o no está insertado arriba
@@ -1653,7 +1659,7 @@ function aplicarConfig() {
       document.getElementById('article-container').innerHTML = `
         <div class="article-kicker">${c.kicker || 'Archivo'}</div>
         <h2>${c.titulo || ''}</h2>
-        <div class="article-byline">${bylineConEnlace(c.byline, c.autor_slug)} &nbsp;·&nbsp; Ilustraciones de la casa &nbsp;·&nbsp; <em>Columna semanal</em></div>
+        <div class="article-byline">${bylineConEnlace(c.byline, c.autor_slugs || c.autor_slug)} &nbsp;·&nbsp; Ilustraciones de la casa &nbsp;·&nbsp; <em>Columna semanal</em></div>
         ${parrafosHTML.join('')}`;
       document.getElementById('pull-quote-wrap').innerHTML = (c.cita && pos === 'final') ? citaHTML : '';
 
@@ -2284,7 +2290,9 @@ function toggleNav() {
     const titulo    = document.getElementById('a-titulo').value.trim();
     const kicker    = document.getElementById('a-kicker').value.trim();
     const byline    = document.getElementById('a-byline').value.trim();
-    const autor_slug = document.getElementById('a-autor-slug').value.trim() || null;
+    const autoresArr  = getAutoresSeleccionados();
+    const autor_slug  = autoresArr[0] || null;           // primer slug (compat. byline simple)
+    const autor_slugs = autoresArr.length ? autoresArr.join(',') : null; // todos, separados por coma
     const contenido = document.getElementById('a-contenido').value.trim();
     const foto_url  = document.getElementById('a-foto').value.trim() || null;
     const cita      = document.getElementById('a-cita').value.trim() || null;
@@ -2299,7 +2307,7 @@ function toggleNav() {
       // Intento principal: con cita_posicion (requiere que exista la columna en Supabase)
       let r = await fetch(`${SB}/rest/v1/columnas`, {
         method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-        body: JSON.stringify({ titulo, kicker, byline, autor_slug, contenido, activa: true, foto_url, cita, cita_autor, cita_posicion })
+        body: JSON.stringify({ titulo, kicker, byline, autor_slug, autor_slugs, contenido, activa: true, foto_url, cita, cita_autor, cita_posicion })
       });
       // Si falla por columna inexistente (error 42703 o 400), reintenta sin cita_posicion
       if (!r.ok) {
@@ -2309,7 +2317,7 @@ function toggleNav() {
           console.warn('⚠️ La columna cita_posicion no existe en la tabla. Publicando sin ella. Agrégala con: ALTER TABLE columnas ADD COLUMN cita_posicion TEXT;');
           r = await fetch(`${SB}/rest/v1/columnas`, {
             method: 'POST', headers: { ...PH, Prefer: 'return=representation' },
-            body: JSON.stringify({ titulo, kicker, byline, autor_slug, contenido, activa: true, foto_url, cita, cita_autor })
+            body: JSON.stringify({ titulo, kicker, byline, autor_slug, autor_slugs, contenido, activa: true, foto_url, cita, cita_autor })
           });
         }
         if (!r.ok) {
@@ -2319,7 +2327,7 @@ function toggleNav() {
         }
       }
       ['a-titulo','a-kicker','a-byline','a-contenido','a-foto','a-cita','a-cita-autor','a-cita-pos-parrafo'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('a-autor-slug').value = '';
+      document.querySelectorAll('.autora-check').forEach(c => c.checked = false);
       document.getElementById('cita-pos-final').checked = true;
       setMsg('msg-col', '✦ Columna publicada con éxito.');
       await Promise.all([cargarColumna(), cargarArchivo(), cargarListaColumnas()]);
@@ -2343,12 +2351,19 @@ function toggleNav() {
       if (!d || !d.length) { el.innerHTML = '<em>Aún no hay columnas publicadas.</em>'; return; }
       el.innerHTML = d.map(c => {
         const f = new Date(c.created_at).toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' });
+        const slugsActuales = c.autor_slugs || (c.autor_slug ? c.autor_slug : '');
+        const slugsLabel = slugsActuales
+          ? `<span style="color:var(--wine);font-size:0.72rem;">✦ ${slugsActuales.split(',').join(', ')}</span>`
+          : `<span style="color:var(--ink-light);font-size:0.72rem;font-style:italic;">Sin autora vinculada</span>`;
         return `<div class="a-row">
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:600;font-size:0.9rem;color:var(--ink);">${c.titulo}</div>
-            <div style="font-size:0.78rem;color:var(--ink-light);">${f}</div>
+            <div style="font-size:0.78rem;color:var(--ink-light);margin-top:2px;">${f} &nbsp;·&nbsp; ${slugsLabel}</div>
           </div>
-          <button class="a-del" onclick="eliminarColumna(${c.id})">Eliminar</button>
+          <div class="a-row-actions">
+            <button class="a-btn-sm" onclick="abrirVincularAutora(${c.id},'${slugsActuales}')">Autora</button>
+            <button class="a-del" onclick="eliminarColumna(${c.id})">Eliminar</button>
+          </div>
         </div>`;
       }).join('');
     } catch(e) { el.innerHTML = '<em>Error cargando columnas.</em>'; }
@@ -2872,24 +2887,39 @@ function toggleNav() {
     } catch(e) { el.innerHTML = '<p>Error cargando autoras.</p>'; }
   }
 
-  // ── Puebla el <select> de autoras en el formulario de columna ──
+  // ── Puebla los checkboxes de autoras en el formulario de columna ──
   async function poblarSelectAutoras() {
-    const sel = document.getElementById('a-autor-slug');
-    if (!sel) return;
+    const wrap = document.getElementById('autoras-check-wrap');
+    if (!wrap) return;
     try {
-      const r = await fetch(`${SB}/rest/v1/autoras?activa=eq.true&order=nombre.asc`, { headers: GH });
+      const r = await fetch(`${SB}/rest/v1/autoras?order=nombre.asc`, { headers: GH });
       const d = await r.json();
-      // Mantener la opción vacía y remplazar el resto
-      sel.innerHTML = '<option value="">— Sin autora vinculada —</option>';
-      if (Array.isArray(d) && d.length) {
-        d.forEach(a => {
-          const opt = document.createElement('option');
-          opt.value = a.slug;
-          opt.textContent = a.nombre;
-          sel.appendChild(opt);
-        });
+      if (!Array.isArray(d) || !d.length) {
+        wrap.innerHTML = '<span style="font-family:var(--body);font-size:0.85rem;color:var(--ink-light);font-style:italic;">No hay autoras registradas aún.</span>';
+        return;
       }
-    } catch(e) {}
+      wrap.innerHTML = d.map(a => `
+        <label style="display:flex;align-items:center;gap:0.55rem;padding:0.3rem 0;cursor:pointer;border-bottom:1px dotted var(--divider);">
+          <input type="checkbox" class="autora-check" value="${a.slug}"
+            style="accent-color:var(--wine);width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+          <span style="font-family:var(--body);font-size:0.92rem;color:var(--ink);">${a.nombre}</span>
+          <span style="font-family:var(--body);font-size:0.72rem;color:var(--ink-light);margin-left:auto;">/${a.slug}</span>
+        </label>`).join('');
+    } catch(e) {
+      wrap.innerHTML = '<span style="font-family:var(--body);font-size:0.85rem;color:var(--wine);">Error cargando autoras.</span>';
+    }
+  }
+
+  // ── Devuelve array de slugs seleccionados en los checkboxes ──
+  function getAutoresSeleccionados() {
+    return [...document.querySelectorAll('.autora-check:checked')].map(c => c.value);
+  }
+
+  // ── Marca los checkboxes correspondientes a una lista de slugs ──
+  function setAutoresSeleccionados(slugsArr) {
+    document.querySelectorAll('.autora-check').forEach(c => {
+      c.checked = slugsArr.includes(c.value);
+    });
   }
 
   // ── Sección pública de autoras ──
@@ -2975,14 +3005,91 @@ function toggleNav() {
     document.body.style.overflow = '';
   }
 
-  // helper: convierte byline en enlace si hay autor_slug
-  function bylineConEnlace(byline, autorSlug) {
+  // helper: convierte byline en enlace si hay autoras vinculadas
+  // autorSlugs puede ser "slug1,slug2" (nuevo) o un slug simple (compat)
+  function bylineConEnlace(byline, autorSlugs) {
     if (!byline) return '';
-    if (!autorSlug) return byline;
-    // envuelve el nombre (lo que va después de "Por ") en un enlace
+    if (!autorSlugs) return byline;
+    const slugs = autorSlugs.split(',').map(s => s.trim()).filter(Boolean);
+    if (!slugs.length) return byline;
+    // Si hay un solo slug: comportamiento original (enlaza el nombre completo)
+    if (slugs.length === 1) {
+      return byline.replace(/(Por\s+)(.+)/, (_, pre, nombre) =>
+        `${pre}<a class="byline-autor-link" href="#" onclick="abrirPerfilAutora('${slugs[0]}');return false;">${nombre}</a>`
+      );
+    }
+    // Si hay varios slugs: necesitamos los nombres — hacemos fetch rápido
+    // Devolvemos el byline con enlace al primero y marcamos los demás con [ver perfil]
+    // (los nombres reales se cargan asincrónicamente)
+    const linksHtml = slugs.map(s =>
+      `<a class="byline-autor-link" href="#" onclick="abrirPerfilAutora('${s}');return false;">✦</a>`
+    ).join(' ');
     return byline.replace(/(Por\s+)(.+)/, (_, pre, nombre) =>
-      `${pre}<a class="byline-autor-link" href="#" onclick="abrirPerfilAutora('${autorSlug}');return false;">${nombre}</a>`
+      `${pre}<span class="byline-multi-wrap">${nombre} ${linksHtml}</span>`
     );
+  }
+
+
+  // ── Modal: vincular autoras a columna existente ──
+  let _vincularColId = null;
+
+  async function abrirVincularAutora(colId, slugsActuales) {
+    _vincularColId = colId;
+    const modal = document.getElementById('vincular-modal');
+    const wrap  = document.getElementById('vincular-checks');
+    const msg   = document.getElementById('vincular-msg');
+    msg.textContent = '';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    wrap.innerHTML = '<span style="font-family:var(--body);font-size:0.85rem;color:var(--ink-light);font-style:italic;">Cargando…</span>';
+    try {
+      const r = await fetch(`${SB}/rest/v1/autoras?order=nombre.asc`, { headers: GH });
+      const d = await r.json();
+      if (!Array.isArray(d) || !d.length) {
+        wrap.innerHTML = '<span style="font-family:var(--body);font-size:0.85rem;color:var(--ink-light);font-style:italic;">No hay autoras registradas.</span>';
+        return;
+      }
+      const seleccionadas = slugsActuales ? slugsActuales.split(',').map(s=>s.trim()) : [];
+      wrap.innerHTML = d.map(a => `
+        <label style="display:flex;align-items:center;gap:0.55rem;padding:0.35rem 0;cursor:pointer;border-bottom:1px dotted var(--divider);">
+          <input type="checkbox" class="vincular-check" value="${a.slug}"
+            ${seleccionadas.includes(a.slug)?'checked':''}
+            style="accent-color:var(--wine);width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+          <span style="font-family:var(--body);font-size:0.92rem;color:var(--ink);">${a.nombre}</span>
+          <span style="font-family:var(--body);font-size:0.72rem;color:var(--ink-light);margin-left:auto;">/${a.slug}</span>
+        </label>`).join('');
+    } catch(e) {
+      wrap.innerHTML = '<span style="font-family:var(--body);font-size:0.85rem;color:var(--wine);">Error cargando autoras.</span>';
+    }
+  }
+
+  function cerrarVincularAutora() {
+    document.getElementById('vincular-modal').style.display = 'none';
+    document.body.style.overflow = '';
+    _vincularColId = null;
+  }
+
+  async function guardarVincularAutora() {
+    if (!_vincularColId) return;
+    const slugs = [...document.querySelectorAll('.vincular-check:checked')].map(c => c.value);
+    const autor_slugs = slugs.length ? slugs.join(',') : null;
+    const autor_slug  = slugs[0] || null;
+    const msg = document.getElementById('vincular-msg');
+    msg.textContent = 'Guardando…';
+    try {
+      const r = await fetch(`${SB}/rest/v1/columnas?id=eq.${_vincularColId}`, {
+        method: 'PATCH',
+        headers: { ...PH, Prefer: 'return=minimal' },
+        body: JSON.stringify({ autor_slug, autor_slugs })
+      });
+      if (!r.ok) throw new Error();
+      msg.textContent = '✦ Guardado.';
+      setTimeout(() => cerrarVincularAutora(), 1000);
+      await Promise.all([cargarListaColumnas(), cargarColumna()]);
+    } catch(e) {
+      msg.textContent = 'Error al guardar. Intenta de nuevo.';
+    }
   }
 
   // ── INIT ──
@@ -2995,5 +3102,20 @@ function toggleNav() {
     cargarAutoras();
   });
 </script>
+
+<!-- ── MODAL: VINCULAR AUTORAS A COLUMNA EXISTENTE ── -->
+<div id="vincular-modal" style="display:none;position:fixed;inset:0;background:rgba(46,36,40,0.92);z-index:1500;display:none;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:var(--cream);max-width:480px;width:100%;padding:2rem;position:relative;">
+    <button onclick="cerrarVincularAutora()" style="position:absolute;top:1rem;right:1rem;background:none;border:1px solid var(--divider);color:var(--ink-light);font-family:var(--body);font-size:0.72rem;padding:0.25rem 0.6rem;cursor:pointer;">✕</button>
+    <div style="font-family:var(--serif);font-size:1.2rem;font-style:italic;color:var(--wine);margin-bottom:0.3rem;">Vincular autoras</div>
+    <div style="font-family:var(--fell);font-style:italic;font-size:0.82rem;color:var(--ink-light);margin-bottom:1.25rem;">Selecciona las autoras para esta columna. Al guardar, el nombre en el byline se vuelve clickeable.</div>
+    <div id="vincular-checks" style="border:1px solid var(--divider);background:var(--cream-dark);padding:0.65rem 0.85rem;max-height:220px;overflow-y:auto;margin-bottom:1rem;"></div>
+    <div style="display:flex;gap:0.75rem;align-items:center;">
+      <button onclick="guardarVincularAutora()" style="background:var(--wine);color:var(--cream);border:none;font-family:var(--body);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.65rem 1.25rem;cursor:pointer;">Guardar ✦</button>
+      <span id="vincular-msg" style="font-family:var(--fell);font-style:italic;font-size:0.82rem;color:var(--wine);"></span>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
